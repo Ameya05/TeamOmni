@@ -1,8 +1,8 @@
-package com.team.omni.weather;
+package org.team.omni.weather;
 
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.MediaType;
@@ -15,17 +15,25 @@ import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 
 @Path("/")
+/**
+ * @author Ameya Advankar
+ */
 public class StormDetectionService {
 
-	/*
-	 * dev test
-	 */
 	final String filename="/Sample.kml";
 	
-	@GET
-	@Path("/detection/{key}")
+	/**
+	 * This service does the following -<br>
+	 * 	1. Takes a Key as input<br>
+	 * 	2. Retrieves the data from NEXRAD and outputs a .kml file
+	 * @param key String
+	 * @return <b>.kml</b> file
+	 * @throws IOException
+	 */
+	@POST
+	@Path("/detection")
 	@Consumes(MediaType.TEXT_PLAIN)
-	public Response detectStorm(@PathParam("key") String key) throws IOException {
+	public Response detectStorm(@FormParam("key") String key) throws IOException {
 
 		byte[] out=null;
 		File kml = new File(filename);
