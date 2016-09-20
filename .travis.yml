@@ -7,4 +7,4 @@ branches:
   only:
     - feature-microservice-D
 install: true
-script: cd \"Microservice D\" && mvn clean install -DskipTests=true
+script: cd "Microservice D" && mvn clean install -DskipTests=true
