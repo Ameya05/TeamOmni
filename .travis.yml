@@ -1,0 +1,10 @@
+language: java
+
+jdk:
+  - oraclejdk8
+sudo: false
+branches:
+  only:
+    - feature-microservice-F
+install: true
+script: cd "Microservice F" && mvn clean install -DskipTests=true
