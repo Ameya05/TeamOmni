@@ -7,4 +7,5 @@ branches:
   only:
     - feature-microservice-C
 install: true
+
 script: cd \"MicroserviceC\" && mvn clean install -DskipTests=true
