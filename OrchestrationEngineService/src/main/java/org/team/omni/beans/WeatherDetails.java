@@ -1,42 +1,69 @@
 package org.team.omni.beans;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonSetter;
-
 public class WeatherDetails {
-	private String type = "";
-	private Temperature temperature = null;
-	private int windSpeed = -1;
+	private String weatherType;
+	
+	private	String temperatureUnit;
+	
+	private	double temperatureValue;
+	
+	private	String windSpeedUnit;
+	
+	private double windSpeedVal;
 
 	public WeatherDetails() {
 	}
 
-	@JsonGetter("weather_type")
-	public String getType() {
-		return type;
+
+	public String getWeatherType()
+	{
+		return weatherType;
 	}
 
-	@JsonSetter("weather_type")
-	public void setType(String type) {
-		this.type = type;
+	public void setWeatherType(String weatherType)
+	{
+		this.weatherType = weatherType;
 	}
 
-	public Temperature getTemperature() {
-		return temperature;
+	public String getTemperatureUnit()
+	{
+		return temperatureUnit;
 	}
 
-	public void setTemperature(Temperature temperature) {
-		this.temperature = temperature;
+	public void setTemperatureUnit(String temperatureUnit)
+	{
+		this.temperatureUnit = temperatureUnit;
 	}
 
-	@JsonGetter("wind_speed")
-	public int getWindSpeed() {
-		return windSpeed;
+	public double getTemperatureValue()
+	{
+		return temperatureValue;
 	}
 
-	@JsonSetter("wind_speed")
-	public void setWindSpeed(int windSpeed) {
-		this.windSpeed = windSpeed;
+	public void setTemperatureValue(double temperatureValue)
+	{
+		this.temperatureValue = temperatureValue;
 	}
+
+	public String getWindSpeedUnit()
+	{
+		return windSpeedUnit;
+	}
+
+	public void setWindSpeedUnit(String windSpeedUnit)
+	{
+		this.windSpeedUnit = windSpeedUnit;
+	}
+
+	public double getWindSpeedVal()
+	{
+		return windSpeedVal;
+	}
+
+	public void setWindSpeedVal(double windSpeedVal)
+	{
+		this.windSpeedVal = windSpeedVal;
+	}
+
 
 }
