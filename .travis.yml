@@ -3,9 +3,28 @@ language: java
 jdk:
   - oraclejdk8
 sudo: false
+
 branches:
   only:
     - feature-microservice-C
 install: true
 
 script: cd "MicroserviceC" && mvn clean install -DskipTests=true
+
+addons:
+  artifacts:
+    s3_region: us-west-2
+    bucket: sga-team-omni
+    
+deploy:
+  - provider: s3
+    access_key_id: $ARTIFACTS_KEY
+    secret_access_key: $ARTIFACTS_SECRET
+    bucket: sga-team-omni
+    region: us-west-2
+    acl: public_read
+    detect_encoding: true
+    skip_cleanup: true
+    on:
+      repo: airavata-courses/TeamOmni
+      branch: feature-microservice-C
