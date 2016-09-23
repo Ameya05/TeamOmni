@@ -11,7 +11,7 @@ script: cd "Microservice E" && mvn clean install -DskipTests=true
 
 before_deploy:
   - cd ..
-  - zip -r omniForecastTrigger.zip Microservice E || true
+  - zip -r omniForecastTrigger.zip "Microservice E" || true
   - mkdir -p "s3_upload_dir"
   - mv omniForecastTrigger.zip s3_upload_dir/omniForecastTrigger.zip || true
 
