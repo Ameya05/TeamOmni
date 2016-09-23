@@ -11,7 +11,7 @@ script: cd "Microservice D" && mvn clean install -DskipTests=true
 
 before_deploy:
   - cd ..
-  - zip -r omniStormClustering.zip Microservice D || true
+  - zip -r omniStormClustering.zip "Microservice D" || true
   - mkdir -p "s3_upload_dir"
   - mv omniStormClustering.zip s3_upload_dir/omniStormClustering.zip || true
 
