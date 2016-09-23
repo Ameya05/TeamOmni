@@ -8,3 +8,23 @@ branches:
     - feature-microservice-D
 install: true
 script: cd "Microservice D" && mvn clean install -DskipTests=true
+
+before_deploy:
+  - cd ..
+  - zip -r omniStormClustering.zip MicroserviceD || true
+  - mkdir -p "s3_upload_dir"
+  - mv omniStormClustering.zip s3_upload_dir/omniStormClustering.zip || true
+
+deploy:
+  - provider: s3
+    access_key_id: $ARTIFACTS_KEY
+    secret_access_key: $ARTIFACTS_SECRET
+    local_dir: s3_upload_dir
+    bucket: sga-team-omni
+    region: us-west-2
+    acl: public_read
+    detect_encoding: true
+    skip_cleanup: true
+    on:
+      repo: airavata-courses/TeamOmni
+      branch: feature-microservice-D
