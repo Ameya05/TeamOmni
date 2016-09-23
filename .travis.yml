@@ -15,7 +15,7 @@ script: cd "MicroserviceB" && python dataIngestor.py &
 
 before_deploy:
   - cd ..
-  - zip -r omniDataIngestor.zip "MicroserviceB" || true
+  - zip -r omniDataIngestor.zip MicroserviceB || true
   - mkdir -p "s3_upload_dir"
   - mv omniDataIngestor.zip s3_upload_dir/omniDataIngestor.zip || true
 
