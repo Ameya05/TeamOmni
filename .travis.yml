@@ -37,7 +37,7 @@ deploy:
     key: omniStormDetector.zip
     bundle_type: zip
     application: SGA-TeamOmni
-    deployment_group: TeamOmniCodeDeployGroup
+    deployment_group: SGA-TeamOmni
     region: us-west-2
     on:
       repo: airavata-courses/TeamOmni
