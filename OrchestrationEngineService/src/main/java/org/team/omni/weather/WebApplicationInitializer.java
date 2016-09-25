@@ -15,6 +15,7 @@ import java.util.logging.SimpleFormatter;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 import javax.sql.DataSource;
 
 import org.team.omni.OrchestrationEngineUtils;
@@ -22,6 +23,7 @@ import org.team.omni.exceptions.OrchestrationEngineException;
 import org.team.omni.orchestration.engine.services.ServiceFactory;
 import org.team.omni.orchestration.engine.workflow.WorkFlowStateFactory;
 
+@WebListener
 public class WebApplicationInitializer implements ServletContextListener {
 	private static final Logger LOGGER = Logger.getLogger("Orchestration");
 

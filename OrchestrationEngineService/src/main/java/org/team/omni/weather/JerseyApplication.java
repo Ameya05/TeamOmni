@@ -17,6 +17,7 @@ public class JerseyApplication extends ResourceConfig {
 		register(MultiPartFeature.class);
 		register(WorkFlowMapBinder.class);
 		packages("org.team.omni.weather");
+		System.out.println("Jersey Application Starting...................................................................................................................");
 	}
 
 	public JerseyApplication(Set<Class<?>> classes) {
