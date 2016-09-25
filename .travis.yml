@@ -11,7 +11,7 @@ script: cd "Microservice D" && mvn clean install -DskipTests=true
 
 before_deploy:
   - cd ..
-  - zip -r omniStormClustering.zip "Microservice D" || true
+  - zip -r omniStormClustering.zip "Microservice D" scripts appspec.yml || true
   - mkdir -p "s3_upload_dir"
   - mv omniStormClustering.zip s3_upload_dir/omniStormClustering.zip || true
 
@@ -25,6 +25,18 @@ deploy:
     acl: public_read
     detect_encoding: true
     skip_cleanup: true
+    on:
+      repo: airavata-courses/TeamOmni
+      branch: feature-microservice-D
+  - provider: codedeploy
+    access_key_id: $ARTIFACTS_KEY
+    secret_access_key: $ARTIFACTS_SECRET
+    bucket: sga-team-omni
+    key: omniStormClustering.zip
+    bundle_type: zip
+    application: SGA-TeamOmni
+    deployment_group: SGA-TeamOmni
+    region: us-west-2
     on:
       repo: airavata-courses/TeamOmni
       branch: feature-microservice-D
