@@ -7,11 +7,11 @@ branches:
   only:
     - feature-microservice-D
 install: true
-script: cd "Microservice D" && mvn clean install -DskipTests=true
+script: cd MicroserviceD && mvn clean install -DskipTests=true
 
 before_deploy:
   - cd ..
-  - zip -r omniStormClustering.zip "Microservice D" scripts appspec.yml || true
+  - zip -r omniStormClustering.zip MicroserviceD scripts appspec.yml || true
   - mkdir -p "s3_upload_dir"
   - mv omniStormClustering.zip s3_upload_dir/omniStormClustering.zip || true
 

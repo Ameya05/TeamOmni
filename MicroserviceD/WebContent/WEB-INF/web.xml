@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
           http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 	version="3.0">
-	<display-name>MicroService D</display-name>
+	<display-name>MicroServiceD</display-name>
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
 		<welcome-file>index.htm</welcome-file>
@@ -14,12 +14,12 @@
 	</welcome-file-list>
  
 	<servlet>
-		<servlet-name>Microservice D Jersey</servlet-name>
+		<servlet-name>MicroserviceD</servlet-name>
 		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>Microservice D</servlet-name>
-		<url-pattern>/api/*</url-pattern>
+		<servlet-name>MicroserviceD</servlet-name>
+		<url-pattern>/storm/*</url-pattern>
 	</servlet-mapping>
 </web-app>

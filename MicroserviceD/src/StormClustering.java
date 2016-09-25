@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response;
 @Path("/")
 public class StormClustering {
 	@POST
-	@Path("/storm/clustering")
+	@Path("/clustering")
 	@Consumes(MediaType.APPLICATION_XML) //MediaType Unconfirmed
 	
 	public Response sendCluster(InputStream incomingData) {
