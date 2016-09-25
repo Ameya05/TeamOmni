@@ -13,7 +13,7 @@ script: cd "MicroserviceC" && mvn clean install -DskipTests=true
 
 before_deploy:
   - cd ..
-  - zip -r omniStormDetector.zip MicroserviceC appspec.yml || true
+  - zip -r omniStormDetector.zip MicroserviceC scripts appspec.yml || true
   - mkdir -p "s3_upload_dir"
   - mv omniStormDetector.zip s3_upload_dir/omniStormDetector.zip || true
 
