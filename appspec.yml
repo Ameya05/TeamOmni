@@ -5,10 +5,10 @@ files:
     destination: /home/ubuntu
 hooks:
   BeforeInstall:
-    - location: scripts/MicroserviceF/beforeInstall.sh
+    - location: scripts/OrchestrationEngineService/beforeInstall.sh
       timeout: 3600
       runas: root
   ApplicationStart:
-    - location: scripts/MicroserviceF/install.sh
+    - location: scripts/OrchestrationEngineService/install.sh
       timeout: 3600
       runas: root
