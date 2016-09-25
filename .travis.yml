@@ -7,11 +7,11 @@ branches:
   only:
     - feature-microservice-E
 install: true
-script: cd "Microservice E" && mvn clean install -DskipTests=true
+script: cd MicroserviceE && mvn clean install -DskipTests=true
 
 before_deploy:
   - cd ..
-  - zip -r omniForecastTrigger.zip "Microservice E" || true
+  - zip -r omniForecastTrigger.zip MicroserviceE scripts appspec.yml || true
   - mkdir -p "s3_upload_dir"
   - mv omniForecastTrigger.zip s3_upload_dir/omniForecastTrigger.zip || true
 
@@ -25,6 +25,18 @@ deploy:
     acl: public_read
     detect_encoding: true
     skip_cleanup: true
+    on:
+      repo: airavata-courses/TeamOmni
+      branch: feature-microservice-E
+  - provider: codedeploy
+    access_key_id: $ARTIFACTS_KEY
+    secret_access_key: $ARTIFACTS_SECRET
+    bucket: sga-team-omni
+    key: omniForecastTrigger.zip
+    bundle_type: zip
+    application: SGA-TeamOmni
+    deployment_group: SGA-TeamOmni
+    region: us-west-2
     on:
       repo: airavata-courses/TeamOmni
       branch: feature-microservice-E
