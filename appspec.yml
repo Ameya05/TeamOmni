@@ -1,0 +1,14 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /home/ubuntu
+hooks:
+  BeforeInstall:
+    - location: scripts/MicroserviceB/beforeInstall.sh
+      timeout: 3600
+      runas: root
+  ApplicationStart:
+    - location: scripts/MicroserviceB/install.sh
+      timeout: 3600
+      runas: root
