@@ -5,6 +5,7 @@
   <version>1.0.0</version>
   <packaging>war</packaging>
   <build>
+	<finalName>omniStormDetector</finalName>
     <sourceDirectory>src</sourceDirectory>
     <plugins>
 	  <plugin>
@@ -12,6 +13,8 @@
         <artifactId>maven-war-plugin</artifactId>
         <version>2.6</version>
         <configuration>
+		  <warSourceDirectory>WebContent</warSourceDirectory>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
           <webResources>
             <resource>
               <directory>${user.dir}</directory>
@@ -28,14 +31,6 @@
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>2.6</version>
-        <configuration>
-          <warSourceDirectory>WebContent</warSourceDirectory>
-          <failOnMissingWebXml>false</failOnMissingWebXml>
         </configuration>
       </plugin>
     </plugins>
