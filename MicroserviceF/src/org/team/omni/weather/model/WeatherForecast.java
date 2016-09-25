@@ -8,15 +8,15 @@ package org.team.omni.weather.model;
  */
 public class WeatherForecast {
 
-	String weatherType;
+	private String weatherType;
 	
-	String temperatureUnit;
+	private String temperatureUnit;
 	
-	double temperatureValue;
+	private double temperatureValue;
 	
-	String windSpeedUnit;
+	private String windSpeedUnit;
 	
-	double windSpeedVal;
+	private double windSpeedVal;
 
 	public String getWeatherType()
 	{
