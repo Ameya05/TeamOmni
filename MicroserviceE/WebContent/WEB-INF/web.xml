@@ -14,12 +14,12 @@
 	</welcome-file-list>
  
 	<servlet>
-		<servlet-name>Microservice E Jersey</servlet-name>
+		<servlet-name>MicroserviceE</servlet-name>
 		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>Microservice E</servlet-name>
-		<url-pattern>/api/*</url-pattern>
+		<servlet-name>MicroserviceE</servlet-name>
+		<url-pattern>/forecast/*</url-pattern>
 	</servlet-mapping>
 </web-app>

@@ -17,7 +17,7 @@ import javax.ws.rs.core.Response;
 @Path("/")
 public class ForecastTrigger {
 	@POST
-	@Path("/storm/clustering")
+	@Path("/trigger")
 	@Consumes(MediaType.TEXT_PLAIN) //MediaType Unconfirmed
 	@Produces(MediaType.TEXT_PLAIN) //MediaType Unconfirmed
 	public Response sendCluster(InputStream incomingData) {
