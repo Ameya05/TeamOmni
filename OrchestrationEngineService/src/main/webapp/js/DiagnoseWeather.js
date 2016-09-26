@@ -30,7 +30,7 @@ angular.module('omni',[])
 			
 			$http({
 				//Test sample url
-				url: "http://ec2-54-70-147-185.us-west-2.compute.amazonaws.com:8080/orchestrationengine/initiate/",
+				url: "http://ec2-54-70-147-185.us-west-2.compute.amazonaws.com:8080/orchestrationengine/rest/initiate/",
 				method: "POST",
 				params: {
 					uid: 001,
@@ -51,7 +51,7 @@ angular.module('omni',[])
 		
 		$scope.fetch_status=function(){
 			$http({
-				url:"http://ec2-54-70-147-185.us-west-2.compute.amazonaws.com:8080/orchestrationengine/queryStatus/001",
+				url:"http://ec2-54-70-147-185.us-west-2.compute.amazonaws.com:8080/orchestrationengine/rest/queryStatus/001",
 				method: GET
 			})
 			.success(function(response){

@@ -13,7 +13,7 @@
   </servlet>
   <servlet-mapping>
      <servlet-name>JerseyRestService</servlet-name>
-     <url-pattern>/*</url-pattern>
+     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
   <listener>
   	<listener-class>org.team.omni.weather.WebApplicationInitializer</listener-class>
