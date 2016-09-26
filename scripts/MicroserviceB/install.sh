@@ -1,10 +1,9 @@
 echo 'starting installation process' >> /var/log/sga-omni-python.log
-cd '/home/ec2-user/MicroserviceB'
+cd '/home/ubuntu/'
+mkdir python
+chmod 777 python
+cp -R /home/ubuntu/MicroserviceB/ /home/ubuntu/python
 
-echo 'Activating virtualenv' >> /var/log/sga-omni-python.log  2>&1
-pip install virtualenv >> /var/log/sga-omni-python.log  2>&1
-virtualenv venv >> /var/log/sga-omni-python.log  2>&1
-. venv/bin/activate >> /var/log/sga-omni-python.log  2>&1
-
+cd '/home/ubuntu/python/MicroserviceB'
 export FLASK_APP=dataIngestor.py
-flask run --host=0.0.0.0 >> /var/log/sga-omni-python.log 2>&1 &
+flask run --host=0.0.0.0 --port=65000>> /var/log/sga-omni-python.log 2>&1 &
