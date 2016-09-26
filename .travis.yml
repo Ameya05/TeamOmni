@@ -12,7 +12,7 @@ script: cd OrchestrationEngineService && mvn -X clean install
 
 before_deploy:
   - cd ..
-  - zip -r omniOrchestrationEngine.zip OrchestrationEngineService || true
+  - zip -r omniOrchestrationEngine.zip OrchestrationEngineService scripts appspec.yml || true
   - mkdir -p "s3_upload_dir"
   - mv omniOrchestrationEngine.zip s3_upload_dir/omniOrchestrationEngine.zip || true
 
@@ -26,6 +26,18 @@ deploy:
     acl: public_read
     detect_encoding: true
     skip_cleanup: true
+    on:
+      repo: airavata-courses/TeamOmni
+      branch: feature-orchestrationengine
+  - provider: codedeploy
+    access_key_id: $ARTIFACTS_KEY
+    secret_access_key: $ARTIFACTS_SECRET
+    bucket: sga-team-omni
+    key: omniOrchestrationEngine.zip
+    bundle_type: zip
+    application: SGA-TeamOmni
+    deployment_group: SGA-TeamOmni
+    region: us-west-2
     on:
       repo: airavata-courses/TeamOmni
       branch: feature-orchestrationengine
