@@ -1,4 +1,4 @@
-
+package test.team.omni.weather;
 
 import static org.junit.Assert.*;
 
@@ -9,6 +9,7 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.team.omni.weather.StormClustering;
 
 public class StormClusteringTest extends JerseyTest {
 
