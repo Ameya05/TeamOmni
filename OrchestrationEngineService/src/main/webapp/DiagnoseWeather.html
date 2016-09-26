@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html ng-app="omni">
+<head>
+	<title>Omni Weather Forecast</title>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
+	<script src="js/DiagnoseWeather.js"></script>
+	
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	
+	<style type="text/css">
+		#container {
+			display: table;
+			padding-top: 10%;
+			padding-bottom: 10%;
+			padding-left: 40%;
+			padding-right: 40%;
+		}
+		
+		#row {
+			display: table-row;
+		}
+		
+		input{
+			width: 100%;
+			margin: 10px 0;
+			padding: 14px 20px;
+			box-sizing: border-box;
+		}
+		
+		
+		input:focus {
+			 border: 2px solid #666;
+		}
+		
+		body {
+			background-color: #3b5998;
+		}
+    </style>
+</head>
+<body>
+	<div id="container" height="80%" width="20%" ng-controller="DiagnoseWeather">
+		<h2> Please enter details </h2>
+		<form id="details">
+			<label for="fdate">Date</label>
+			<input type="date" id="fdate" name="fdate" ng-model="date" placeholder="yyyy-MM-dd"/>
+			<label for="ftime">Time</label>
+			<input type="time" id="ftime" name="ftime" ng-model="time" placeholder="HH:mm:ss"/>
+			<label for="fstation">Station Name</label><br/>
+			<select autocomplete="off" id="fstation" name="fstation" ng-model="station">
+				<option selected value="KHDX">Holloman AFB, NM</option>
+				<option value="KHGX">Houston, TX</option>
+				<option value="KHTX">Huntsville/Hytop, AL</option>
+				<option value="KIND">Indianapolis, IN</option>
+				<option value="KJKL">Jackson, KY</option>
+				<option value="KDGX">Jackson, MS</option>
+			</select>
+			<input type="button" ng-click="click()" value="Diagnose Weather Conditions"/>
+			<input type="button" ng-click="fetch_status" value="Fetch Status"/>
+		</form>
+		
+	</div>
+</body>
+</html>
