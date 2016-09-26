@@ -18,4 +18,8 @@
   <listener>
   	<listener-class>org.team.omni.weather.WebApplicationInitializer</listener-class>
   </listener>
+  <context-param>
+  	<param-name>configuration_folder</param-name>
+  	<param-value>/home/ubuntu/config</param-value>
+  </context-param>
 </web-app>

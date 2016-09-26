@@ -30,7 +30,7 @@ public class WebApplicationInitializer implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
 		System.out.println("Starting up!");
-		String configFolderName = (String) servletContextEvent.getServletContext().getAttribute("configuration_folder");
+		String configFolderName = (String) servletContextEvent.getServletContext().getInitParameter("configuration_folder");
 		File propFile = new File(configFolderName + "/service.properties");
 		File hikariCPConfigFile = new File(configFolderName + "/hikaricp_config.properties");
 		Properties hikariCPConfig = new Properties();
