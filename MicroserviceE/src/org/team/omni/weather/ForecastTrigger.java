@@ -1,26 +1,27 @@
+package org.team.omni.weather;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Random;
 
-//import javax.print.attribute.standard.Media;
 import javax.ws.rs.Consumes;
-//import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-//import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import com.sun.jersey.multipart.FormDataParam;
  
 @Path("/")
 public class ForecastTrigger {
 	@POST
 	@Path("/trigger")
-	@Consumes(MediaType.TEXT_PLAIN) //MediaType Unconfirmed
-	@Produces(MediaType.TEXT_PLAIN) //MediaType Unconfirmed
-	public Response sendCluster(InputStream incomingData) {
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Produces(MediaType.TEXT_PLAIN)
+	public Response sendCluster(@FormDataParam("clustering") InputStream incomingData) 
+	{
 		StringBuilder builder = new StringBuilder();
 		try {
 			BufferedReader in = new BufferedReader(new InputStreamReader(incomingData));
@@ -33,13 +34,12 @@ public class ForecastTrigger {
 		}
 		System.out.println("Data Received: " + builder.toString());
  
-			   Random randomno = new Random();
-			  boolean trigger=false;
-			if (randomno.nextInt(2)==1)
-				trigger=true;
+		Random randomno = new Random();
+		boolean trigger=false;
+		if (randomno.nextInt(2)==1)
+			trigger=true;
 			     
-		
-		return Response.status(200).entity(String.valueOf(trigger)).build(); //response as string
+		return Response.status(200).entity(trigger).build();
 	}
 
 }
