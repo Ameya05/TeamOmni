@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.glassfish.jersey.internal.util.collection.MultivaluedStringMap;
@@ -20,7 +21,7 @@ public class StormDetectionService extends Service {
 	public File generateKMLFile(String key) throws IOException {
 		MultivaluedMap<String, String> map = new MultivaluedStringMap();
 		map.add("key", key);
-		return OrchestrationEngineUtils.saveFileFromResposne(serviceAddress.request().post(Entity.form(map)), orchestrationEngineValueStore.getServiceFolder());
+		return OrchestrationEngineUtils.saveFileFromResposne(serviceAddress.request().post(Entity.entity(map, MediaType.MULTIPART_FORM_DATA)), orchestrationEngineValueStore.getServiceFolder());
 	}
 
 }

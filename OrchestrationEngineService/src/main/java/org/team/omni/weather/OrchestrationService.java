@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -25,13 +26,14 @@ public class OrchestrationService {
 	@POST
 	@Path("/initiate")
 	@Produces(MediaType.TEXT_PLAIN)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public String initiate(@FormParam("date") String date, @FormParam("time") String time, @FormParam("station") String stationName, @FormParam("id") Long id, @FormParam("idtoken") String idtoken) {
-		WorkFlowExecutionStatus executionStatus = workFlowMap.createWorkFlow(id, stationName, LocalDateTime.parse(date + time, DateTimeFormatter.ofPattern("")));
+		WorkFlowExecutionStatus executionStatus = workFlowMap.createWorkFlow(id, stationName, LocalDateTime.parse(date + time, DateTimeFormatter.ofPattern("MM/dd/yyyyHH:mm:ss")));
 		return executionStatus.getValue();
 	}
 
 	@GET
-	@Path("/queryStatus")
+	@Path("/queryStatus/{id}")
 	@Produces(MediaType.TEXT_PLAIN)
 	public WorkFlowState queryStatus(@PathParam("id") long id) {
 		return workFlowMap.fetchWorkFlowState(id);
