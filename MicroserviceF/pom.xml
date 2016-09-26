@@ -5,6 +5,7 @@
   <version>1.0.0</version>
   <packaging>war</packaging>
   <build>
+	<finalName>omniStormForecast</finalName>
     <sourceDirectory>src</sourceDirectory>
     <plugins>
       <plugin>
