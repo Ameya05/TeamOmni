@@ -6,7 +6,7 @@ sudo: false
 
 branches:
   only:
-    - feature-microservice-C
+    - release-microservice-C
 install: true
 
 script: cd "MicroserviceC" && mvn clean install -DskipTests=true
@@ -29,7 +29,7 @@ deploy:
     skip_cleanup: true
     on:
       repo: airavata-courses/TeamOmni
-      branch: feature-microservice-C
+      branch: release-microservice-C
   - provider: codedeploy
     access_key_id: $ARTIFACTS_KEY
     secret_access_key: $ARTIFACTS_SECRET
@@ -41,4 +41,4 @@ deploy:
     region: us-west-2
     on:
       repo: airavata-courses/TeamOmni
-      branch: feature-microservice-C
+      branch: release-microservice-C
