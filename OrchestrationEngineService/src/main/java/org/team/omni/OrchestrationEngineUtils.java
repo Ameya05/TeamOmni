@@ -7,7 +7,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
 import java.util.Properties;
+import java.util.Random;
 
 import javax.sql.DataSource;
 import javax.ws.rs.core.Response;
@@ -61,11 +63,14 @@ public class OrchestrationEngineUtils {
 	 *            obtained from Content-Disposition header
 	 * @return the File object for which the data has been saved
 	 * @throws IOException
+	 * @throws ParseException
 	 */
-	public static File saveFileFromResposne(Response response, String folder) throws IOException {
+	public static File saveFileFromResposne(Response response, String folder) throws IOException, ParseException {
 		InputStream in = (InputStream) response.getEntity();
-		ContentDisposition contentDisposition = (ContentDisposition) response.getHeaders().getFirst("Content-Disposition");
-		return saveFile(in, folder + "/" + contentDisposition.getFileName());
+		// ContentDisposition contentDisposition = new
+		// ContentDisposition((String)
+		// response.getHeaders().getFirst("Content-Disposition"));
+		return saveFile(in, folder + "/File_" + (new Random().nextInt() + ".kml"));
 	}
 
 }

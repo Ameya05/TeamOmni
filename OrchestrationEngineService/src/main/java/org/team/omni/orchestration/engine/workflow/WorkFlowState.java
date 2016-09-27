@@ -20,7 +20,7 @@ public class WorkFlowState {
 	private String previousService = "";
 	private String errorMessage = "";
 	private String detailedErrorMessage = "";
-	private WorkFlowExecutionStatus executionStatus;
+	private WorkFlowExecutionStatus executionStatus = WorkFlowExecutionStatus.EXECUTING;
 	private long userId;
 	private long workFlowId;
 	private DataSource dataSource;
@@ -42,7 +42,7 @@ public class WorkFlowState {
 			}
 			try (ResultSet resultSet = preparedStatement.getGeneratedKeys();) {
 				if (resultSet.next()) {
-					setUserId(resultSet.getLong(1));
+					setWorkFlowId(resultSet.getLong(1));
 				}
 			}
 		} catch (SQLException e) {

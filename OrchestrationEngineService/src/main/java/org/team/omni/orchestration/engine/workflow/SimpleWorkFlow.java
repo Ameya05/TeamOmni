@@ -38,7 +38,6 @@ public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetail
 
 	@Override
 	public void executeWorkFlow() {
-		workFlowState.setExecutionStatus(WorkFlowExecutionStatus.EXECUTING);
 		String key = handleDataIngestionService();
 		File kmlFile = handleStormDetectionService(key);
 		File clusteringFile = handleStormClusteringService(kmlFile);

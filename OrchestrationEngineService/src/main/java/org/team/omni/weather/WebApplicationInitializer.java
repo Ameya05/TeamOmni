@@ -19,6 +19,7 @@ import javax.servlet.annotation.WebListener;
 import javax.sql.DataSource;
 
 import org.team.omni.OrchestrationEngineUtils;
+import org.team.omni.OrchestrationEngineValueStore;
 import org.team.omni.exceptions.OrchestrationEngineException;
 import org.team.omni.orchestration.engine.services.ServiceFactory;
 import org.team.omni.orchestration.engine.workflow.WorkFlowStateFactory;
@@ -47,6 +48,7 @@ public class WebApplicationInitializer implements ServletContextListener {
 		} catch (SecurityException | IOException e) {
 			throw new OrchestrationEngineException(e);
 		}
+		OrchestrationEngineValueStore.getOrchestrationEngineValueStore().setServiceFolder(configFolderName);
 		DataSource dataSource = OrchestrationEngineUtils.createDataSource(hikariCPConfig);
 		Set<Object> keys = props.keySet();
 		Map<String, String> serviceAddressDirectory = new HashMap<>();

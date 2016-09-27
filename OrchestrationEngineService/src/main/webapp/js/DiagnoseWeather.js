@@ -26,18 +26,17 @@ angular.module('omni',[])
 			var hour = $scope.time.getHours();
 			var min = $scope.time.getMinutes();
 			var sec = $scope.time.getSeconds();
-			var timeString= ""+ (hour<10 ? "0" + hour : hour) + ":" + (min<10 ? "0" + min : min) + ":"+ (sec<10 ? "0" + sec : sec) ;
+			var timeString= ""+ (hour<10 ? "0" + hour : hour) + (min<10 ? "0" + min : min) + (sec<10 ? "0" + sec : sec) ;
 			
 			$http({
-				//Test sample url
-				url: "http://ec2-54-70-147-185.us-west-2.compute.amazonaws.com:8080/orchestrationengine/rest/initiate/",
-				method: "POST",
+				url: "rest/initiate/",
+				method: "GET",
 				params: {
-					uid: 001,
-					idtoken: 123abc,
-					date: dateString,
-					time: timeString,
-					station: $scope.station
+					"uid": 001,
+					"idtoken": "123abc",
+					"date": dateString,
+					"time": timeString,
+					"station": $scope.station
 				}
 			})
 			.success(function(response) {
@@ -51,14 +50,14 @@ angular.module('omni',[])
 		
 		$scope.fetch_status=function(){
 			$http({
-				url:"http://ec2-54-70-147-185.us-west-2.compute.amazonaws.com:8080/orchestrationengine/rest/queryStatus/001",
+				url:"rest/queryStatus/001",
 				method: GET
 			})
 			.success(function(response){
-				alert(response);
+				alert(response.executionStatus);
 			})
 			.error(function(response){
-				alert(response);
+				alert(response.executionStatus);
 			})
 		}
 	});

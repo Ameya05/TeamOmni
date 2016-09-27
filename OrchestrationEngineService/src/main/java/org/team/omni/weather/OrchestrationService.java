@@ -5,12 +5,11 @@ import java.time.format.DateTimeFormatter;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.team.omni.orchestration.engine.workflow.WorkFlowExecutionStatus;
@@ -23,18 +22,18 @@ public class OrchestrationService {
 	@Inject
 	private WorkFlowMap workFlowMap;
 
-	@POST
+	@GET
 	@Path("/initiate")
 	@Produces(MediaType.TEXT_PLAIN)
-	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public String initiate(@FormParam("date") String date, @FormParam("time") String time, @FormParam("station") String stationName, @FormParam("id") Long id, @FormParam("idtoken") String idtoken) {
-		WorkFlowExecutionStatus executionStatus = workFlowMap.createWorkFlow(id, stationName, LocalDateTime.parse(date + time, DateTimeFormatter.ofPattern("MM/dd/yyyyHH:mm:ss")));
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	public String initiate(@QueryParam("date") String date, @QueryParam("time") String time, @QueryParam("station") String stationName, @QueryParam("uid") Long id, @QueryParam("idtoken") String idtoken) {
+		WorkFlowExecutionStatus executionStatus = workFlowMap.createWorkFlow(id, stationName, LocalDateTime.parse(date + time, DateTimeFormatter.ofPattern("MM/dd/yyyyHHmmss")));
 		return executionStatus.getValue();
 	}
 
 	@GET
 	@Path("/queryStatus/{id}")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	public WorkFlowState queryStatus(@PathParam("id") long id) {
 		return workFlowMap.fetchWorkFlowState(id);
 	}

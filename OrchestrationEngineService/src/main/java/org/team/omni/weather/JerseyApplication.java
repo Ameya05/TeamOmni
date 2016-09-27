@@ -12,10 +12,10 @@ import org.glassfish.jersey.server.ResourceConfig;
 public class JerseyApplication extends ResourceConfig {
 
 	public JerseyApplication() {
-		register(ObjectMapperProvider.class);
-		register(JacksonFeature.class);
-		register(MultiPartFeature.class);
-		register(WorkFlowMapBinder.class);
+		register(new ObjectMapperProvider());
+		register(new JacksonFeature());
+		register(new MultiPartFeature());
+		register(new WorkFlowMapBinder());
 		packages("org.team.omni.weather");
 		System.out.println("Jersey Application Starting...................................................................................................................");
 	}
