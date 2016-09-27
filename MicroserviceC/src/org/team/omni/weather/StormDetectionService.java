@@ -1,9 +1,8 @@
 package org.team.omni.weather;
 
-import javax.ws.rs.POST;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.Consumes;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.MediaType;
 
@@ -30,10 +29,9 @@ public class StormDetectionService {
 	 * @return <b>.kml</b> file
 	 * @throws IOException
 	 */
-	@POST
+	@GET
 	@Path("/detection")
-	@Consumes(MediaType.TEXT_PLAIN)
-	public Response detectStorm(@FormParam("key") String key) throws IOException {
+	public Response detectStorm(@QueryParam("key") String key) throws IOException {
 
 		byte[] out=null;
 		File kml = new File(filename);
