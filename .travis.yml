@@ -4,7 +4,7 @@ python:
 
 branches:
   only:
-    - feature-microservice-B
+    - release-microservice-B
 
 install:
    - pip install -r "MicroserviceB/requirements.txt"
@@ -30,7 +30,7 @@ deploy:
     skip_cleanup: true
     on:
       repo: airavata-courses/TeamOmni
-      branch: feature-microservice-B
+      branch: release-microservice-B
   - provider: codedeploy
     access_key_id: $ARTIFACTS_KEY
     secret_access_key: $ARTIFACTS_SECRET
@@ -42,4 +42,4 @@ deploy:
     region: us-west-2
     on:
       repo: airavata-courses/TeamOmni
-      branch: feature-microservice-B
+      branch: release-microservice-B
