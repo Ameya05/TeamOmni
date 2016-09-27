@@ -39,7 +39,7 @@ public class ForecastTrigger {
 		if (randomno.nextInt(2)==1)
 			trigger=true;
 			     
-		return Response.status(200).entity(trigger).build();
+		return Response.status(200).entity(String.valueOf(trigger)).build();
 	}
 
 }
