@@ -20,6 +20,6 @@
   </listener>
   <context-param>
   	<param-name>configuration_folder</param-name>
-  	<param-value>D:\Documents\Projects\configuration</param-value>
+  	<param-value>/home/ubuntu/config</param-value>
   </context-param>
 </web-app>
