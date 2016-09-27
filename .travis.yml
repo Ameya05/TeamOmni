@@ -5,7 +5,7 @@ jdk:
 sudo: false
 branches:
   only:
-    - feature-microservice-E
+    - release-microservice-E
 install: true
 script: cd MicroserviceE && mvn clean install -DskipTests=true
 
@@ -27,7 +27,7 @@ deploy:
     skip_cleanup: true
     on:
       repo: airavata-courses/TeamOmni
-      branch: feature-microservice-E
+      branch: release-microservice-E
   - provider: codedeploy
     access_key_id: $ARTIFACTS_KEY
     secret_access_key: $ARTIFACTS_SECRET
@@ -39,4 +39,4 @@ deploy:
     region: us-west-2
     on:
       repo: airavata-courses/TeamOmni
-      branch: feature-microservice-E
+      branch: release-microservice-E
