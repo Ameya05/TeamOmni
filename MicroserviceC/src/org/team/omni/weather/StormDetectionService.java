@@ -19,7 +19,7 @@ import org.apache.commons.io.IOUtils;
  */
 public class StormDetectionService {
 
-	final String filename="/omniStormDetector/Sample.kml";
+	final String filename="Sample.kml";
 	
 	/**
 	 * This service does the following -<br>
