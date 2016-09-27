@@ -5,7 +5,7 @@ jdk:
 sudo: false
 branches:
   only:
-    - feature-orchestrationengine
+    - release-orchestrationengine
 install: true
 
 script: cd OrchestrationEngineService && mvn -X clean install
@@ -28,7 +28,7 @@ deploy:
     skip_cleanup: true
     on:
       repo: airavata-courses/TeamOmni
-      branch: feature-orchestrationengine
+      branch: release-orchestrationengine
   - provider: codedeploy
     access_key_id: $ARTIFACTS_KEY
     secret_access_key: $ARTIFACTS_SECRET
@@ -40,4 +40,4 @@ deploy:
     region: us-west-2
     on:
       repo: airavata-courses/TeamOmni
-      branch: feature-orchestrationengine
+      branch: release-orchestrationengine
