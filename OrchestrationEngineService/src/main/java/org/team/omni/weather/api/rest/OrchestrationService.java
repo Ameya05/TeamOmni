@@ -1,4 +1,4 @@
-package org.team.omni.weather;
+package org.team.omni.weather.api.rest;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

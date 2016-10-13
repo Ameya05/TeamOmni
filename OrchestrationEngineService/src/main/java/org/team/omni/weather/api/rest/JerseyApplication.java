@@ -1,4 +1,4 @@
-package org.team.omni.weather;
+package org.team.omni.weather.api.rest;
 
 import java.util.Set;
 

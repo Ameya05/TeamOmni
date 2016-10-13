@@ -84,12 +84,12 @@ public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetail
 	}
 
 	@Override
-	public WorkFlowState getWorkFlowState() {
+	public synchronized WorkFlowState getWorkFlowState() {
 		return workFlowState;
 	}
 
 	@Override
-	public WeatherDetails fetchResult() {
+	public synchronized WeatherDetails fetchResult() {
 		return weatherDetails;
 	}
 

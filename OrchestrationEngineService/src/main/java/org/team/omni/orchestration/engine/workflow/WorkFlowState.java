@@ -50,20 +50,20 @@ public class WorkFlowState {
 		}
 	}
 
-	public void setCurrentService(String service) {
+	public synchronized void setCurrentService(String service) {
 		this.previousService = currentService;
 		this.currentService = service;
 	}
 
-	public String getCurrentService() {
+	public synchronized String getCurrentService() {
 		return this.currentService;
 	}
 
-	public String getPreviousService() {
+	public synchronized String getPreviousService() {
 		return this.previousService;
 	}
 
-	public void setError(Exception e) {
+	public synchronized void setError(Exception e) {
 		this.errorMessage = e.getMessage();
 		StringWriter stringWriter = new StringWriter();
 		e.printStackTrace(new PrintWriter(stringWriter));
@@ -71,20 +71,20 @@ public class WorkFlowState {
 		this.executionStatus = WorkFlowExecutionStatus.EXECUTION_FAILURE;
 	}
 
-	public String getErrorMessage() {
+	public synchronized String getErrorMessage() {
 		return this.errorMessage;
 	}
 
-	public String getDetailedErrorMessage() {
+	public synchronized String getDetailedErrorMessage() {
 		return this.detailedErrorMessage;
 	}
 
-	public WorkFlowExecutionStatus getExecutionStatus() {
+	public synchronized WorkFlowExecutionStatus getExecutionStatus() {
 		return executionStatus;
 	}
 
 	@JsonProperty
-	public void setExecutionStatus(WorkFlowExecutionStatus executionStatus) {
+	public synchronized void setExecutionStatus(WorkFlowExecutionStatus executionStatus) {
 		this.executionStatus = executionStatus;
 		try (Connection connection = dataSource.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement("UPDATE WORK_FLOW_DETAILS SET STATUS=? WHERE ID=?");
@@ -99,31 +99,31 @@ public class WorkFlowState {
 		}
 	}
 
-	public long getUserId() {
+	public synchronized long getUserId() {
 		return userId;
 	}
 
 	@JsonProperty
-	public void setUserId(long userId) {
+	public synchronized void setUserId(long userId) {
 		this.userId = userId;
 	}
 
-	public long getWorkFlowId() {
+	public synchronized long getWorkFlowId() {
 		return workFlowId;
 	}
 
 	@JsonProperty
-	public void setWorkFlowId(long workFlowId) {
+	public synchronized void setWorkFlowId(long workFlowId) {
 		this.workFlowId = workFlowId;
 	}
 
 	@JsonIgnore
-	public DataSource getDataSource() {
+	public synchronized DataSource getDataSource() {
 		return dataSource;
 	}
 
 	@JsonProperty
-	public void setDataSource(DataSource dataSource) {
+	public synchronized void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 

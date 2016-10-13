@@ -5,4 +5,4 @@
  * @author eldho
  *
  */
-package org.team.omni.weather;
+package org.team.omni.weather.api.rest;
