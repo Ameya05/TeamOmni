@@ -19,7 +19,7 @@ import org.apache.commons.io.IOUtils;
  */
 public class StormDetectionService {
 
-	final String filename="/home/ubuntu/Sample.kml";
+	final String filename="C:\\Sample.kml";//"/home/ubuntu/Sample.kml";
 	
 	/**
 	 * This service does the following -<br>
