@@ -11,7 +11,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.sun.jersey.multipart.FormDataParam;
+import org.glassfish.jersey.media.multipart.FormDataParam;
  
 @Path("/")
 public class StormClustering {
@@ -29,7 +29,6 @@ public class StormClustering {
 		} catch (Exception e) {
 			System.out.println("Error Parsing: - ");
 		}
-		System.out.println("Data Received: " + builder.toString());
 		return Response.status(200).entity(builder.toString()).build();
 	}
 }
