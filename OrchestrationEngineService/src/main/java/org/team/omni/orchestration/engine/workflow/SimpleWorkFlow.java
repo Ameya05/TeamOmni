@@ -4,6 +4,7 @@ import java.io.File;
 import java.time.LocalDateTime;
 
 import org.team.omni.beans.WeatherDetails;
+import org.team.omni.exceptions.OrchestrationEngineException;
 import org.team.omni.exceptions.ServiceExecutionException;
 import org.team.omni.orchestration.engine.services.DataIngestionService;
 import org.team.omni.orchestration.engine.services.ForecastTriggerService;
@@ -12,12 +13,13 @@ import org.team.omni.orchestration.engine.services.StormClusteringService;
 import org.team.omni.orchestration.engine.services.StormDetectionService;
 import org.team.omni.orchestration.engine.services.WeatherForecastExecutionService;
 
-public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetails> {
+public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetails>, Runnable {
 	private ServiceFactory serviceFactory;
 	private String stationName = "";
 	private LocalDateTime timeStamp;
 	private WeatherDetails weatherDetails = null;
 	private WorkFlowState workFlowState;
+	private Thread workFlowExecutionThread = null;
 
 	public SimpleWorkFlow(ServiceFactory serviceFactory, String stationName, LocalDateTime timeStamp, WorkFlowState workFlowState) {
 		this.serviceFactory = serviceFactory;
@@ -38,14 +40,12 @@ public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetail
 
 	@Override
 	public void executeWorkFlow() {
-		String key = handleDataIngestionService();
-		File kmlFile = handleStormDetectionService(key);
-		File clusteringFile = handleStormClusteringService(kmlFile);
-		boolean forecast = handleForecastTriggerService(clusteringFile);
-		if (forecast) {
-			weatherDetails = hanldeWeatherForecastExecutionService();
+		if (workFlowExecutionThread == null || !workFlowExecutionThread.isAlive()) {
+			workFlowExecutionThread = new Thread(this);
+			workFlowExecutionThread.start();
+		} else {
+			throw new OrchestrationEngineException("Cannot execute another workflow when Workflow execution is in progress");
 		}
-		workFlowState.setExecutionStatus(WorkFlowExecutionStatus.EXECUTION_COMPLETE);
 	}
 
 	public String handleDataIngestionService() {
@@ -91,6 +91,18 @@ public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetail
 	@Override
 	public WeatherDetails fetchResult() {
 		return weatherDetails;
+	}
+
+	@Override
+	public void run() {
+		String key = handleDataIngestionService();
+		File kmlFile = handleStormDetectionService(key);
+		File clusteringFile = handleStormClusteringService(kmlFile);
+		boolean forecast = handleForecastTriggerService(clusteringFile);
+		if (forecast) {
+			weatherDetails = hanldeWeatherForecastExecutionService();
+		}
+		workFlowState.setExecutionStatus(WorkFlowExecutionStatus.EXECUTION_COMPLETE);
 	}
 
 }
