@@ -34,12 +34,11 @@ public class ForecastTrigger {
 			System.out.println("Error Parsing: - ");
 		}
 		System.out.println("Data Received: " + builder.toString());
- 
 		Random randomno = new Random();
 		boolean trigger=false;
 		if (randomno.nextInt(2)==1)
 			trigger=true;
-			     
+		
 		return Response.status(200).entity(String.valueOf(trigger)).build();
 	}
 
