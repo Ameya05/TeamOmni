@@ -23,13 +23,13 @@ public class StormForecastTest extends JerseyTest {
     }
 
     @Test
-    public void StormDetectionResponseStatusTest() {
+    public void StormForecastResponseStatusTest() {
         int status = target("/run").request().get().getStatus();
         assertEquals(200,status);
     }
     
     @Test
-    public void StormDetectionResponseFileTest() {
+    public void StormForecastResponseFileTest() {
         	
     	byte[] file1Bytes;
 		try {
