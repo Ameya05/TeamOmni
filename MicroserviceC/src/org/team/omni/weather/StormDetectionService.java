@@ -13,13 +13,21 @@ import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 
+import org.apache.log4j.Logger;
+
 @Path("/")
 /**
  * @author Ameya Advankar
  */
 public class StormDetectionService {
+	
+	
 
 	final String filename="C:\\Sample.kml";//"/home/ubuntu/Sample.kml";
+	
+	static { System.setProperty("my.log", System.getProperty("user.dir")
+            + File.separator + "MicroClogs.log"); }
+	final static Logger logger = Logger.getLogger(StormDetectionService.class);
 	
 	/**
 	 * This service does the following -<br>
@@ -35,11 +43,14 @@ public class StormDetectionService {
 
 		byte[] out=null;
 		File kml = new File(filename);
+		logger.info("Entered Microservice C : key- " + key);
 		
 		if(kml.exists())
 		{
+			
 			InputStream inStream = new FileInputStream(kml);
 			out= IOUtils.toByteArray(inStream);
+			logger.info("KML file exists : return response to Ochestration Engine ");
 			return Response
 					.ok( out, MediaType.APPLICATION_OCTET_STREAM)
 					.header("Content-Disposition","attachment;filename=\"" + kml.getName() + "\"")
@@ -47,6 +58,7 @@ public class StormDetectionService {
 		}
 		else
 		{
+			logger.error("KML file does not exist :  File exists? "+ kml.exists());
 			return Response.status(503).entity("Error while fetching kml file").build();
 		}
 		
