@@ -15,7 +15,7 @@ app = Flask(__name__)
 
 @app.route('/nexrad/generate/url/<nexrad_station>/<month>/<day>/<year>/<hour>/<minute>/<seconds>')
 def hello_world(nexrad_station, month, day, year, hour, minute, seconds):
-    app.logger.warning('Entered Microservice B')
+    app.logger.warning('Initiated Microservice B with input: ' + nexrad_station + month + day + year + hour + minute + seconds)
     # read a volume scan file on S3. I happen to know this file exists.
     # s3conn = boto.connect_s3()
     # bucket = s3conn.get_bucket('noaa-nexrad-level2')
@@ -24,7 +24,7 @@ def hello_world(nexrad_station, month, day, year, hour, minute, seconds):
     # s3key= bucket.get_key('2015/05/15/KVWX/KVWX20150515_080737_V06.gz')
     s3key = ("/" + nexrad_station + "/" + month + "/" + day + "/" + year + "/" + hour + "/" + minute + "/" + seconds)
 
-    app.logger.warning('Returning to orchestration service')
+    app.logger.warning('Returning to orchestration service with s3key:'+s3key)
 
     return s3key
 
