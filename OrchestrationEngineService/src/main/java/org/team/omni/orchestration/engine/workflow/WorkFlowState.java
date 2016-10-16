@@ -21,11 +21,11 @@ public class WorkFlowState {
 	private String errorMessage = "";
 	private String detailedErrorMessage = "";
 	private WorkFlowExecutionStatus executionStatus = WorkFlowExecutionStatus.EXECUTING;
-	private long userId;
+	private String userId;
 	private long workFlowId;
 	private DataSource dataSource;
 
-	public WorkFlowState(DataSource dataSource, long userId) {
+	public WorkFlowState(DataSource dataSource, String userId) {
 		this.setDataSource(dataSource);
 		this.setUserId(userId);
 		createEntry();
@@ -34,7 +34,7 @@ public class WorkFlowState {
 	private void createEntry() {
 		try (Connection connection = dataSource.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO WORK_FLOW_DETAILS (USER_ID,STATUS) VALUES(?,?)", Statement.RETURN_GENERATED_KEYS);
-			preparedStatement.setLong(1, userId);
+			preparedStatement.setString(1, userId);
 			preparedStatement.setString(2, executionStatus.getValue());
 			int rowsUpadted = preparedStatement.executeUpdate();
 			if (rowsUpadted == 0) {
@@ -99,12 +99,12 @@ public class WorkFlowState {
 		}
 	}
 
-	public synchronized long getUserId() {
+	public synchronized String getUserId() {
 		return userId;
 	}
 
 	@JsonProperty
-	public synchronized void setUserId(long userId) {
+	public synchronized void setUserId(String userId) {
 		this.userId = userId;
 	}
 

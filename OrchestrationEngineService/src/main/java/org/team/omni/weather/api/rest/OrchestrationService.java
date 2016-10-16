@@ -26,16 +26,16 @@ public class OrchestrationService {
 	@Path("/initiate")
 	@Produces(MediaType.TEXT_PLAIN)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	public String initiate(@QueryParam("date") String date, @QueryParam("time") String time, @QueryParam("station") String stationName, @QueryParam("uid") Long id, @QueryParam("idtoken") String idtoken) {
+	public String initiate(@QueryParam("date") String date, @QueryParam("time") String time, @QueryParam("station") String stationName, @QueryParam("uid") String id, @QueryParam("idtoken") String idtoken) {
 		WorkFlowExecutionStatus executionStatus = workFlowMap.createWorkFlow(id, stationName, LocalDateTime.parse(date + time, DateTimeFormatter.ofPattern("MM/dd/yyyyHHmmss")));
 		return executionStatus.getValue();
 	}
 
 	@GET
-	@Path("/queryStatus/{id}")
+	@Path("/queryStatus/{id}/{idToken}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public WorkFlowState queryStatus(@PathParam("id") long id) {
-		return workFlowMap.fetchWorkFlowState(id);
+	public WorkFlowState queryStatus(@PathParam("id") String id, @PathParam("idToken") String idToken) {
+		return workFlowMap.fetchWorkFlowState(id, idToken);
 	}
 
 }

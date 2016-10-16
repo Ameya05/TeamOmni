@@ -14,7 +14,7 @@ public class WorkFlowStateFactory {
 		return WORK_FLOW_STATE_FACTORY;
 	}
 
-	public WorkFlowState createWorkFlowState(long userId) {
+	public WorkFlowState createWorkFlowState(String userId) {
 		return new WorkFlowState(dataSource, userId);
 
 	}

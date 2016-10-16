@@ -11,7 +11,7 @@ import org.team.omni.exceptions.OrchestrationEngineException;
 import org.team.omni.orchestration.engine.services.ServiceFactory;
 
 public class WorkFlowMap {
-	private Map<Long, Deque<OrchestrationEngineWorkFlow<WeatherDetails>>> workFlowDetails;
+	private Map<String, Deque<OrchestrationEngineWorkFlow<WeatherDetails>>> workFlowDetails;
 
 	private static final WorkFlowMap WORK_FLOW_MAP = new WorkFlowMap();
 
@@ -19,7 +19,7 @@ public class WorkFlowMap {
 		workFlowDetails = new ConcurrentHashMap<>();
 	}
 
-	public WorkFlowExecutionStatus createWorkFlow(long userId, String stationName, LocalDateTime timeStamp) {
+	public WorkFlowExecutionStatus createWorkFlow(String userId, String stationName, LocalDateTime timeStamp) {
 		Deque<OrchestrationEngineWorkFlow<WeatherDetails>> workFlowQueue;
 		if (workFlowDetails.containsKey(userId)) {
 			workFlowQueue = workFlowDetails.get(userId);
@@ -33,7 +33,7 @@ public class WorkFlowMap {
 		return workFlow.getWorkFlowState().getExecutionStatus();
 	}
 
-	public WorkFlowState fetchWorkFlowState(long userId) {
+	public WorkFlowState fetchWorkFlowState(String userId, String idToken) {
 		if (!workFlowDetails.containsKey(userId)) {
 			throw new OrchestrationEngineException("User Id could not be found: " + userId);
 		}
