@@ -35,6 +35,7 @@ public class StormDetectionServiceTest extends JerseyTest {
         	
     	byte[] file1Bytes,file2Bytes;
 		try {
+
 			 Response output = target("/detection").request().get();
 			 InputStream in = (InputStream) output.getEntity();
 			 file1Bytes=IOUtils.toByteArray(in);

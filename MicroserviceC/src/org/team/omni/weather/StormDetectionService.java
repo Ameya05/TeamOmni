@@ -21,7 +21,6 @@ import org.apache.log4j.Logger;
  */
 public class StormDetectionService {
 	
-	
 
 	final String filename="/home/ubuntu/Sample.kml";
 	
