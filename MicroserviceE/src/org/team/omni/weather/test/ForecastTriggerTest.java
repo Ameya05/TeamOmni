@@ -35,7 +35,7 @@ public class ForecastTriggerTest extends JerseyTest {
     @Test
     public void ForecastTriggerResponseStatusTest() {
     	
-    	File kmlFile=new File("C:\\Sample.kml");
+    	File kmlFile=new File("/home/ubuntu/Sample.kml");
     	MultiPart multiPartEntity = new FormDataMultiPart();
 		multiPartEntity.bodyPart(new FileDataBodyPart("clustering", kmlFile));
         int status = target("/trigger").request().post(Entity.entity(multiPartEntity, MediaType.MULTIPART_FORM_DATA)).getStatus();
@@ -46,7 +46,7 @@ public class ForecastTriggerTest extends JerseyTest {
     @Test
     public void ForecastTriggerResponseTest() {
 	
-	    	File kmlFile=new File("C:\\Sample.kml");
+	    	File kmlFile=new File("/home/ubuntu/Sample.kml");
 	    	MultiPart multiPartEntity = new FormDataMultiPart();
 			multiPartEntity.bodyPart(new FileDataBodyPart("clustering", kmlFile));
 			Response output = target("/trigger").request().post(Entity.entity(multiPartEntity, MediaType.MULTIPART_FORM_DATA));
