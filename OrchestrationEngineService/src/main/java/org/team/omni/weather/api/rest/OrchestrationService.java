@@ -32,10 +32,10 @@ public class OrchestrationService {
 	}
 
 	@GET
-	@Path("/queryStatus/{id}/{idToken}")
+	@Path("/queryStatus/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public WorkFlowState queryStatus(@PathParam("id") String id, @PathParam("idToken") String idToken) {
-		return workFlowMap.fetchWorkFlowState(id, idToken);
+	public WorkFlowState queryStatus(@PathParam("id") String id) {
+		return workFlowMap.fetchWorkFlowState(id);
 	}
 
 }

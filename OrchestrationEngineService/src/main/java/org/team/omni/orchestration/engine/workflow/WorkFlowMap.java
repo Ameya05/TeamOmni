@@ -33,7 +33,7 @@ public class WorkFlowMap {
 		return workFlow.getWorkFlowState().getExecutionStatus();
 	}
 
-	public WorkFlowState fetchWorkFlowState(String userId, String idToken) {
+	public WorkFlowState fetchWorkFlowState(String userId) {
 		if (!workFlowDetails.containsKey(userId)) {
 			throw new OrchestrationEngineException("User Id could not be found: " + userId);
 		}

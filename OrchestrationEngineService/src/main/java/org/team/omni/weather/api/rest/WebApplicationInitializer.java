@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.FileHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
@@ -43,6 +44,7 @@ public class WebApplicationInitializer implements ServletContextListener {
 			FileHandler fileHandler = new FileHandler(logsFolder.getAbsolutePath() + "/" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss")) + ".log");
 			fileHandler.setFormatter(new SimpleFormatter());
 			LOGGER.addHandler(fileHandler);
+			LOGGER.setLevel(Level.INFO);
 			props.load(new FileInputStream(propFile));
 			hikariCPConfig.load(new FileInputStream(hikariCPConfigFile));
 		} catch (SecurityException | IOException e) {

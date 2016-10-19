@@ -67,7 +67,10 @@ angular.module('omni')
 			
 			$http({
 				url : "rest/queryStatus/"+uid,
-				method : "GET"
+				method : "GET",
+				params : {
+					"idtoken" : idToken
+				}
 			}).success(function(response) {
 				alert(response.executionStatus);
 			}).error(function(response) {
