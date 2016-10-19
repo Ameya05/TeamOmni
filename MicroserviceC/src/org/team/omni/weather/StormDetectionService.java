@@ -23,7 +23,7 @@ public class StormDetectionService {
 	
 	
 
-	final String filename="C:\\Sample.kml";//"/home/ubuntu/Sample.kml";
+	final String filename="/home/ubuntu/Sample.kml";
 	
 	static { System.setProperty("my.log", System.getProperty("user.dir")
             + File.separator + "MicroClogs.log"); }
