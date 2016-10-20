@@ -5,18 +5,16 @@ from nose.tools import assert_equal
 app = dataIngestor.app.test_client()
 
 def test_status_code():
+	nexrad_station='KVWX'
+	month='07'
+	day='14'
+	year='2009'
+	hour='02'
+	minute='02'
+	seconds='05'
 
- 	nexrad_station='KVWX'
-    month='07'
-    day='14'
-    year='2009'
-    hour='02'
-    minute='02'
-    seconds='05'
-
-    result = app.get("/nexrad/generate/url/" + nexrad_station +"/"+month+"/"+day+"/"+year+"/"+hour+"/"+minute+"/"+seconds)
-
-   	assert_equal(result.status_code, 200) 
+	result = app.get("/nexrad/generate/url/" + nexrad_station +"/"+month+"/"+day+"/"+year+"/"+hour+"/"+minute+"/"+seconds)
+	assert_equal(result.status_code, 200) 
 
 def test_data_success():
 
