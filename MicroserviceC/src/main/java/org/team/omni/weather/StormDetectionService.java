@@ -1,4 +1,4 @@
-package main.org.team.omni.weather;
+package org.team.omni.weather;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
 public class StormDetectionService {
 	
 
-	final String filename="/home/ubuntu/Sample.kml";
+	final String filename="Sample.kml";
 	
 	static { System.setProperty("my.log", System.getProperty("user.dir")
             + File.separator + "MicroClogs.log"); }

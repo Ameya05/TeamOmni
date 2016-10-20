@@ -1,4 +1,4 @@
-package test.org.team.omni.weather;
+package org.team.omni.weather;
 
 
 
@@ -7,7 +7,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.*;
 
-import main.org.team.omni.weather.StormDetectionService;
+import org.team.omni.weather.StormDetectionService;
 
 import static org.junit.Assert.*;
 
@@ -42,7 +42,7 @@ public class StormDetectionServiceTest extends JerseyTest {
 			 Response output = target("/detection").request().get();
 			 InputStream in = (InputStream) output.getEntity();
 			 file1Bytes=IOUtils.toByteArray(in);
-			file2Bytes = Files.readAllBytes(Paths.get("/home/ubuntu/Sample.kml"));
+			file2Bytes = Files.readAllBytes(Paths.get("Sample.kml"));
 			String file1 = new String(file1Bytes, StandardCharsets.UTF_8);
 	    	String file2 = new String(file2Bytes, StandardCharsets.UTF_8);
 	 
