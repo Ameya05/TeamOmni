@@ -1,4 +1,4 @@
-package org.team.omni.weather;
+package main.org.team.omni.weather;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

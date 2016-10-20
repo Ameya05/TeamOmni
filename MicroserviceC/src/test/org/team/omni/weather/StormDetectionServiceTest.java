@@ -1,10 +1,13 @@
-package org.team.omni.weather.test;
+package test.org.team.omni.weather;
+
+
 
 import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.*;
-import org.team.omni.weather.StormDetectionService;
+
+import main.org.team.omni.weather.StormDetectionService;
 
 import static org.junit.Assert.*;
 
