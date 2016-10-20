@@ -1,6 +1,7 @@
 package org.team.omni.weather.api.filter;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

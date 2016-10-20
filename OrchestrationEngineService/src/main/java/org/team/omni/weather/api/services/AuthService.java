@@ -9,8 +9,8 @@ import java.util.logging.Logger;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 
@@ -22,7 +22,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 public class AuthService {
 	
 	private static final Logger LOGGER = Logger.getLogger("Orchestration");
-    private static final HttpTransport transport = new NetHttpTransport();
+    private static HttpTransport transport;
     private static final JsonFactory jsonFactory = new JacksonFactory();
     private static final String CLIENT_ID = "335496797213-lfl268trivj44l05q58ia6j33kpu16n0.apps.googleusercontent.com";
     
@@ -31,11 +31,21 @@ public class AuthService {
      * @param idToken
      * @return True if authenticated successfully, False if not authenticated or exception encountered
      */
-	public boolean authenticate(String idToken) 
-	{	
+	public boolean authenticate(String idToken)
+	{			
+		try 
+		{
+			transport = GoogleNetHttpTransport.newTrustedTransport();
+		} 
+		catch (Exception e)
+		{
+			LOGGER.log(Level.SEVERE, "Exception while creating transport object", e);
+			return false;
+		}
+		
 		GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
 				.setAudience(Arrays.asList(CLIENT_ID))
-			    .setIssuer("https://accounts.google.com")
+			    .setIssuer("accounts.google.com")
 			    .build();
 		try 
 		{
@@ -48,6 +58,7 @@ public class AuthService {
 				String userId = payload.getSubject();
 				String name = (String) payload.get("name");
 				LOGGER.log(Level.INFO,"Successfully authenticated user ( "+name+"-"+userId+" )");
+				
 				return true;
 			}
 			else
