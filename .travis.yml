@@ -12,9 +12,10 @@ install: true
 script: cd "MicroserviceC" && mvn package  
 before_deploy:
   - cd ..
-  - zip -r omniStormDetector.zip MicroserviceC scripts appspec.yml || true
+  - cp MicroserviceC/target/*.war .
+  - tar -cvzf omniStormDetector.tar.gz MicroserviceC scripts appspec.yml *.war|| true
   - mkdir -p "s3_upload_dir"
-  - mv omniStormDetector.zip s3_upload_dir/omniStormDetector.zip || true
+  - mv omniStormDetector.tar.gz s3_upload_dir/omniStormDetector.tar.gz || true
 
 deploy:
   - provider: s3
@@ -33,8 +34,8 @@ deploy:
     access_key_id: $ARTIFACTS_KEY
     secret_access_key: $ARTIFACTS_SECRET
     bucket: sga-team-omni
-    key: omniStormDetector.zip
-    bundle_type: zip
+    key: omniStormDetector.tar.gz
+    bundle_type: tar.gz
     application: SGA-TeamOmni
     deployment_group: SGA-TeamOmni
     region: us-west-2
