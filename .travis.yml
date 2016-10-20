@@ -12,7 +12,7 @@ install:
 
 script: 
 - cd "MicroserviceB" && nosetests DataIngestorTest.py
-- cd "MicroserviceB" && python dataIngestor.py &
+- python dataIngestor.py &
 
 
 before_deploy:
