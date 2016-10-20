@@ -9,8 +9,7 @@ branches:
     - feature-microservice-C
 install: true
 
-script: cd "MicroserviceC" && mvn clean install -DskipTests=true
-
+script: cd "MicroserviceC" && mvn package  
 before_deploy:
   - cd ..
   - zip -r omniStormDetector.zip MicroserviceC scripts appspec.yml || true
