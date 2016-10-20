@@ -10,7 +10,9 @@ install:
    - pip install -r "MicroserviceB/requirements.txt"
 #  - pip install -r requirements.txt
 
-script: cd "MicroserviceB" && python dataIngestor.py &
+script: 
+- cd "MicroserviceB" && nosetests DataIngestorTest.py
+- cd "MicroserviceB" && python dataIngestor.py &
 
 
 before_deploy:
