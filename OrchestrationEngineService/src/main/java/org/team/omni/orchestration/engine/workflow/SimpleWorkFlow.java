@@ -2,6 +2,8 @@ package org.team.omni.orchestration.engine.workflow;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.team.omni.beans.WeatherDetails;
 import org.team.omni.exceptions.OrchestrationEngineException;
@@ -14,6 +16,8 @@ import org.team.omni.orchestration.engine.services.StormDetectionService;
 import org.team.omni.orchestration.engine.services.WeatherForecastExecutionService;
 
 public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetails>, Runnable {
+	
+	private static final Logger LOGGER = Logger.getLogger("Orchestration");
 	private ServiceFactory serviceFactory;
 	private String stationName = "";
 	private LocalDateTime timeStamp;
@@ -95,14 +99,30 @@ public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetail
 
 	@Override
 	public void run() {
+		LOGGER.log(Level.INFO,"==================================\nBeginning workflow for - "+ workFlowState.getUserId());
+		
 		String key = handleDataIngestionService();
+		LOGGER.log(Level.INFO,"DataIngestionService successfully executed. Key fetched: "+key);
+		
 		File kmlFile = handleStormDetectionService(key);
+		LOGGER.log(Level.INFO,"StormDetectionService successfully executed.");
+		
 		File clusteringFile = handleStormClusteringService(kmlFile);
+		LOGGER.log(Level.INFO,"StormClusteringService successfully executed.");
+		
 		boolean forecast = handleForecastTriggerService(clusteringFile);
+		LOGGER.log(Level.INFO,"ForecastTriggerService returned Storm status: "+forecast);
+		
 		if (forecast) {
+			LOGGER.log(Level.INFO,"Since storm is present, running Weather Forecast: "+forecast);
 			weatherDetails = hanldeWeatherForecastExecutionService();
+			workFlowState.setExecutionStatus(WorkFlowExecutionStatus.EXECUTION_COMPLETE);
 		}
-		workFlowState.setExecutionStatus(WorkFlowExecutionStatus.EXECUTION_COMPLETE);
+		else {
+			LOGGER.log(Level.INFO,"Since no storm is present, skipping Weather Forecast: "+forecast);
+			workFlowState.setExecutionStatus(WorkFlowExecutionStatus.EXECUTION_NOT_REQUIRED);
+		}
+		
 	}
 
 }
