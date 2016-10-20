@@ -42,7 +42,7 @@ public class StormDetectionServiceTest extends JerseyTest {
 			 Response output = target("/detection").request().get();
 			 InputStream in = (InputStream) output.getEntity();
 			 file1Bytes=IOUtils.toByteArray(in);
-			file2Bytes = Files.readAllBytes(Paths.get("Sample.kml"));
+			file2Bytes = Files.readAllBytes(Paths.get("omniStormDetector/Sample.kml"));
 			String file1 = new String(file1Bytes, StandardCharsets.UTF_8);
 	    	String file2 = new String(file2Bytes, StandardCharsets.UTF_8);
 	 
