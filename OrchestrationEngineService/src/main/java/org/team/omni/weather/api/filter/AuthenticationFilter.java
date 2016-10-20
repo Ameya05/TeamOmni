@@ -23,7 +23,7 @@ public class AuthenticationFilter implements ContainerRequestFilter
 	{
 		MultivaluedMap<String, String> queryParameters = request.getUriInfo().getQueryParameters();
 		
-		String idToken = queryParameters.getFirst("idToken");
+		String idToken = queryParameters.getFirst("idtoken");
 		LOGGER.log(Level.INFO, "Size of queryParameters: "+queryParameters.size()+"\n Authenticating idToken: "+idToken);
 		
 		AuthService authService = new AuthService();
