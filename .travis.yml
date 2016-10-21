@@ -7,7 +7,7 @@ branches:
   only:
     - feature-microservice-F
 install: true
-script: cd MicroserviceF && mvn clean install -DskipTests=true
+script: cd MicroserviceF && mvn package
 
 
 before_deploy:
