@@ -12,8 +12,8 @@ install: true
 script: cd "MicroserviceC" && mvn package  
 before_deploy:
   - cd ..
-  - cp MicroserviceC/target/*.war .
-  - tar -cvzf omniStormDetector.tar.gz MicroserviceC scripts appspec.yml *.war|| true
+  - cp MicroserviceC/target/*.war . || true
+  - tar -cvzf omniStormDetector.tar.gz MicroserviceC scripts appspec.yml *.war || true
   - mkdir -p "s3_upload_dir"
   - mv omniStormDetector.tar.gz s3_upload_dir/omniStormDetector.tar.gz || true
 
