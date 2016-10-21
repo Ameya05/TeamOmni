@@ -16,9 +16,9 @@ script:
 
 
 before_deploy:
-  - zip -r omniDataIngestor.zip MicroserviceB scripts appspec.yml|| true
+  - tar zcvf app.tar.gz MicroserviceB scripts appspec.yml|| true
   - mkdir -p "s3_upload_dir"
-  - mv omniDataIngestor.zip s3_upload_dir/omniDataIngestor.zip || true
+  - mv app.tar.gz s3_upload_dir/app.tar.gz || true
 
 deploy:
   - provider: s3
@@ -37,7 +37,7 @@ deploy:
     access_key_id: $ARTIFACTS_KEY
     secret_access_key: $ARTIFACTS_SECRET
     bucket: sga-team-omni
-    key: omniDataIngestor.zip
+    key: app.tar.gz
     bundle_type: zip
     application: SGA-TeamOmni
     deployment_group: SGA-TeamOmni
