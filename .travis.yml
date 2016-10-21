@@ -35,7 +35,7 @@ deploy:
     secret_access_key: $ARTIFACTS_SECRET
     bucket: sga-team-omni
     key: omniStormDetector.tar.gz
-    bundle_type: tar.gz
+    bundle_type: tgz
     application: SGA-TeamOmni
     deployment_group: SGA-TeamOmni
     region: us-west-2
