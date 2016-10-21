@@ -9,7 +9,11 @@ branches:
     - feature-microservice-C
 install: true
 
-script: cd "MicroserviceC" && mvn package  
+script: cd "MicroserviceC" && mvn package
+
+services:
+  - docker
+  
 before_deploy:
   - cd ..
   - cp MicroserviceC/target/*.war . || true
