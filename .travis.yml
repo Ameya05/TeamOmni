@@ -16,9 +16,9 @@ script:
 
 
 before_deploy:
-  - tar zcvf app.tar.gz MicroserviceB scripts appspec.yml|| true
+  - tar -zcvf app.tar.gz MicroserviceB scripts appspec.yml|| true
   - mkdir -p "s3_upload_dir"
-  - mv app.tar.gz s3_upload_dir/app.tar.gz || true
+  - mv data_ingestion.tar.gz s3_upload_dir/data_ingestion.tar.gz || true
 
 deploy:
   - provider: s3
@@ -37,7 +37,7 @@ deploy:
     access_key_id: $ARTIFACTS_KEY
     secret_access_key: $ARTIFACTS_SECRET
     bucket: sga-team-omni
-    key: app.tar.gz
+    key: data_ingestion.tar.gz
     bundle_type: tgz
     application: SGA-TeamOmni
     deployment_group: SGA-TeamOmni
