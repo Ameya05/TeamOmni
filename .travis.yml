@@ -16,7 +16,7 @@ script:
 
 before_deploy:
   - cd ..
-  - tar -cvzf omniDataIngestor.tar.gz MicroserviceB scripts appspec.yml || true
+  - tar -cvzf omniDataIngestor.tar.gz MicroserviceB scripts appspec.yml Dockerfile || true
   - mkdir -p "s3_upload_dir"
   - mv omniDataIngestor.tar.gz s3_upload_dir/omniDataIngestor.tar.gz || true
 
