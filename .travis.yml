@@ -8,7 +8,6 @@ branches:
 
 install:
    - pip install -r "MicroserviceB/requirements.txt"
-#  - pip install -r requirements.txt
 
 script: 
 - cd "MicroserviceB" && nosetests DataIngestorTest.py
