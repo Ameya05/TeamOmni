@@ -7,8 +7,7 @@ branches:
   only:
     - feature-microservice-E
 install: true
-script: cd MicroserviceE && mvn clean install -DskipTests=true
-
+script: cd MicroserviceE && mvn package
 before_deploy:
   - cd ..
   - zip -r omniForecastTrigger.zip MicroserviceE scripts appspec.yml || true
