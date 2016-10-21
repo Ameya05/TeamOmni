@@ -47,7 +47,7 @@ public class StormDetectionService {
 
 		//load test
 
-		int[] arr=new int[200000];long sum=0;
+		int[] a=new int[200000];long sum=0;
 		for(int i=0;i<200000;i++)
 			{
 				a[i]=i;
