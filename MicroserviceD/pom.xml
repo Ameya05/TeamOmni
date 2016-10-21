@@ -22,6 +22,14 @@
         <configuration>
           <warSourceDirectory>WebContent</warSourceDirectory>
           <failOnMissingWebXml>false</failOnMissingWebXml>
+          <webResources>
+            <resource>
+              <directory>${user.dir}</directory>
+              <includes>
+		        <include>Sample.kml</include> 
+		      </includes>
+            </resource>
+          </webResources>
         </configuration>
       </plugin>
     </plugins>

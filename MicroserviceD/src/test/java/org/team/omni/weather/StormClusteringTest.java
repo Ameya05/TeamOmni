@@ -1,4 +1,4 @@
-package org.team.omni.weather.test;
+package org.team.omni.weather;
 
 import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.client.ClientConfig;
@@ -45,7 +45,7 @@ public class StormClusteringTest extends JerseyTest {
 
     @Test
     public void StormClusteringResponseStatusTest() {
-    	File kmlFile=new File("/home/ubuntu/Sample.kml");
+    	File kmlFile=new File("Sample.kml");
     	MultiPart multiPartEntity = new FormDataMultiPart();
 		multiPartEntity.bodyPart(new FileDataBodyPart("kml", kmlFile));
         int status = target("/clustering").request().post(Entity.entity(multiPartEntity, MediaType.MULTIPART_FORM_DATA)).getStatus();
@@ -57,7 +57,7 @@ public class StormClusteringTest extends JerseyTest {
         	
     	byte[] file1Bytes;
 		try {
-	    	File kmlFile=new File("/home/ubuntu/Sample.kml");
+	    	File kmlFile=new File("Sample.kml");
 	    	MultiPart multiPartEntity = new FormDataMultiPart();
 			multiPartEntity.bodyPart(new FileDataBodyPart("kml", kmlFile));
 			 Response output = target("/clustering").request().post(Entity.entity(multiPartEntity, MediaType.MULTIPART_FORM_DATA));
