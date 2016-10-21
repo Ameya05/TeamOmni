@@ -10,11 +10,12 @@ install:
    - pip install -r "MicroserviceB/requirements.txt"
 
 script: 
-- cd "MicroserviceB" && nosetests DataIngestorTest.py
-- python dataIngestor.py &
+   - cd "MicroserviceB" && nosetests DataIngestorTest.py
+   - python dataIngestor.py &
 
 
 before_deploy:
+  - cd ..
   - tar -cvzf omniDataIngestor.tar.gz MicroserviceB scripts appspec.yml || true
   - mkdir -p "s3_upload_dir"
   - mv omniDataIngestor.tar.gz s3_upload_dir/omniDataIngestor.tar.gz || true
