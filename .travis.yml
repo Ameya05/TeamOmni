@@ -10,9 +10,9 @@ install: true
 script: cd MicroserviceE && mvn package
 before_deploy:
   - cd ..
-  - zip -r omniForecastTrigger.zip MicroserviceE scripts appspec.yml || true
+  - tar -cvzf omniForecastTrigger.tar.gz MicroserviceE scripts appspec.yml Dockerfile|| true
   - mkdir -p "s3_upload_dir"
-  - mv omniForecastTrigger.zip s3_upload_dir/omniForecastTrigger.zip || true
+  - mv omniForecastTrigger.tar.gz s3_upload_dir/omniForecastTrigger.tar.gz || true
 
 deploy:
   - provider: s3
@@ -31,8 +31,8 @@ deploy:
     access_key_id: $ARTIFACTS_KEY
     secret_access_key: $ARTIFACTS_SECRET
     bucket: sga-team-omni
-    key: omniForecastTrigger.zip
-    bundle_type: zip
+    key: omniForecastTrigger.tar.gz
+    bundle_type: tgz
     application: SGA-TeamOmni
     deployment_group: SGA-TeamOmni
     region: us-west-2
