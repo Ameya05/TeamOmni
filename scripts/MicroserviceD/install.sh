@@ -1,5 +1,4 @@
-echo 'Copying Microservice D war to jetty webapps location' >> /var/log/sga-omni-jetty.log 2>&1
-cp /home/ubuntu/MicroserviceD/target/*.war /opt/jetty/webapps/
-echo 'Starting jetty service' >> /var/log/sga-omni-jetty.log 2>&1
-sudo service jetty start >> /var/log/sga-omni-jetty.log 2>&1 &
-sleep 10
+echo '===============Building docker===============' >> /var/log/sga-docker.log 2>&1
+sudo docker build --build-arg APP_URL=https://s3-us-west-2.amazonaws.com/sga-team-omni/omniStormClustering.tar.gz -t omni/stormcluster:v1 . >> /var/log/sga-docker.log 2>&1
+echo '===============Running docker===============' >> /var/log/sga-docker.log 2>&1
+sudo docker run -it --name omniStormClustering -h storm.detector -p 8082:8080 -d omni/stormcluster:v1 >> /var/log/sga-docker.log 2>&1
