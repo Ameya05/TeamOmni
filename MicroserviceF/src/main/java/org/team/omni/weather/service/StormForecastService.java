@@ -32,6 +32,24 @@ public class StormForecastService
 	@Path("/run")
 	public Response detectStorm() throws IOException {
 		logger.info("Entered Microservice F"); 
+
+		//load test
+
+		int[] a=new int[200000];long sum=0;
+		for(int i=0;i<200000;i++)
+			{
+				a[i]=i;
+				sum+=i;
+				sum-=i;
+
+			}
+
+			for(int i=0;i<200000;i++)
+				a[i]=0;
+				
+			
+		//load test
+
 		WeatherForecast forecast = new WeatherForecast();
 		forecast.setWeatherType("Rainy");
 		forecast.setTemperatureUnit("deg. F");
