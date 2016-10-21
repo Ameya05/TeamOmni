@@ -16,7 +16,7 @@ script:
 
 
 before_deploy:
-  - tar -zcvf data_ingestion.gz MicroserviceB scripts appspec.yml|| true
+  - tar -zcvf data_ingestion.tar.gz MicroserviceB scripts appspec.yml|| true
   - mkdir -p "s3_upload_dir"
   - mv data_ingestion.tar.gz s3_upload_dir/data_ingestion.tar.gz || true
 
