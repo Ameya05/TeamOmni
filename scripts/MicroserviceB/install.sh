@@ -1,9 +1,4 @@
-echo 'starting installation process' >> /var/log/sga-omni-python.log
-cd '/home/ubuntu/'
-mkdir python
-chmod 777 python
-cp -R /home/ubuntu/MicroserviceB/ /home/ubuntu/python
-
-cd '/home/ubuntu/python/MicroserviceB'
-export FLASK_APP=dataIngestor.py
-flask run --host=0.0.0.0 --port=65000>> /var/log/sga-omni-python.log 2>&1 &
+echo '===============Building docker===============' >> /var/log/sga-docker.log 2>&1
+docker build --build-arg APP_URL=https://s3-us-west-2.amazonaws.com/sga-team-omni/omniDataIngestor.tar.gz -t omni/python:v1 . >> /var/log/sga-docker.log 2>&1
+echo '===============Running docker===============' >> /var/log/sga-docker.log 2>&1
+docker run -it --name data-ingestor-service -h omni.python -p 65000:65000 -d omni/python:v1
