@@ -43,6 +43,24 @@ public class StormDetectionService {
 		byte[] out=null;
 		File kml = new File(filename);
 		logger.info("Entered Microservice C : key- " + key);
+
+
+		//load test
+
+		int[] arr=new int[200000];long sum=0;
+		for(int i=0;i<200000;i++)
+			{
+				a[i]=i;
+				sum+=i;
+				sum-=i;
+
+			}
+
+			for(int i=0;i<200000;i++)
+				a[i]=0;
+				
+			
+		//load test
 		
 		if(kml.exists())
 		{
