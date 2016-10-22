@@ -42,7 +42,7 @@ deploy:
     bundle_type: tgz
     application: SGA-TeamOmni
     deployment_group: SGA-TeamOmni
-    region: us-west-2
+    region: us-east-1
     on:
       repo: airavata-courses/TeamOmni
       branch: feature-microservice-C
