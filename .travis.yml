@@ -12,7 +12,7 @@ script: cd MicroserviceE && mvn package
 before_deploy:
   - cd ..
   - cp MicroserviceE/target/*.war . || true
-  - tar -cvzf omniForecastTrigger.tar.gz MicroserviceE scripts appspec.yml Dockerfile|| true
+  - tar -cvzf omniForecastTrigger.tar.gz *.war scripts appspec.yml Dockerfile|| true
   - mkdir -p "s3_upload_dir"
   - mv omniForecastTrigger.tar.gz s3_upload_dir/omniForecastTrigger.tar.gz || true
 
