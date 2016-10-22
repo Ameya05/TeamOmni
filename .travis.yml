@@ -27,7 +27,7 @@ deploy:
     secret_access_key: $ARTIFACTS_SECRET
     local_dir: s3_upload_dir
     bucket: sga-team-omni
-    region: us-east-1
+    region: us-west-2
     acl: public_read
     detect_encoding: true
     skip_cleanup: true
