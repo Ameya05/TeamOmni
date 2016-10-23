@@ -5,7 +5,7 @@ jdk:
 sudo: false
 branches:
   only:
-    - feature-microservice-D
+    - milestone2-microservice-D
 install: true
 script: cd MicroserviceD && mvn package
 
@@ -28,7 +28,7 @@ deploy:
     skip_cleanup: true
     on:
       repo: airavata-courses/TeamOmni
-      branch: feature-microservice-D
+      branch: milestone2-microservice-D
   - provider: codedeploy
     access_key_id: $ARTIFACTS_KEY
     secret_access_key: $ARTIFACTS_SECRET
@@ -36,8 +36,8 @@ deploy:
     key: omniStormClustering.tar.gz
     bundle_type: tgz
     application: SGA-TeamOmni
-    deployment_group: SGA-TeamOmni
+    deployment_group: SGA-TeamOmniProduction
     region: us-east-1
     on:
       repo: airavata-courses/TeamOmni
-      branch: feature-microservice-D
+      branch: milestone2-microservice-D
