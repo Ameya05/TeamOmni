@@ -5,7 +5,7 @@ jdk:
 sudo: false
 branches:
   only:
-    - feature-microservice-F
+    - milestone2-microservice-F
 install: true
 script: cd MicroserviceF && mvn package
 
@@ -29,7 +29,7 @@ deploy:
     skip_cleanup: true
     on:
       repo: airavata-courses/TeamOmni
-      branch: feature-microservice-F
+      branch: milestone2-microservice-F
   - provider: codedeploy
     access_key_id: $ARTIFACTS_KEY
     secret_access_key: $ARTIFACTS_SECRET
@@ -37,8 +37,8 @@ deploy:
     key: omniRunForecast.tar.gz
     bundle_type: tgz
     application: SGA-TeamOmni
-    deployment_group: SGA-TeamOmni
+    deployment_group: SGA-TeamOmniProduction
     region: us-east-1
     on:
       repo: airavata-courses/TeamOmni
-      branch: feature-microservice-F
+      branch: milestone2-microservice-F
