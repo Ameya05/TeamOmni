@@ -1,8 +1,11 @@
 language: java
 
-jdk:
-  - oraclejdk8
 sudo: false
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
+
 branches:
   only:
     - milestone2-microservice-D
