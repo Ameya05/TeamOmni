@@ -20,7 +20,7 @@ public class CurrentApplicationContextListener extends ApplicationContextListene
 		this.address = System.getenv("DOCKER_HOST");
 		logger.info("Set this.address: "+this.address);
 		
-		this.port = 8080;
+		this.port = 8081;
 		this.maxWorkLoad = 100;
 		this.serviceName = "StormDetectionService";
 	}
