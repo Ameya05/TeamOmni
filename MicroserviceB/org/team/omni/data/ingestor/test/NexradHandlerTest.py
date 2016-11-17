@@ -13,7 +13,6 @@ KABR = 'KABR'
 
 
 class NexradHandlerTest(unittest.TestCase):
-
     def setUp(self):
         self.nexrad = NexradHandler("https://noaa-nexrad-level2.s3.amazonaws.com")
 

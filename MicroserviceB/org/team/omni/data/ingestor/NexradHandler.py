@@ -1,9 +1,9 @@
-import requests
-import re
 import logging
+import re
 from datetime import datetime
 from datetime import timedelta
 
+import requests
 from lxml import etree
 
 DEFAULT_DATA_TAG_NAME = 'Prefix'
@@ -35,10 +35,7 @@ class NexradFileDetails:
         self._modified_date_time = modified_date_time
 
 
-
-
 class NexradHandler:
-
     def __init__(self, nexrad_url):
         self._url = nexrad_url
         self._details_fetch_base_url = nexrad_url + "/?delimiter=%2F&prefix="
@@ -68,7 +65,6 @@ class NexradHandler:
                                 month) + "%2F" + self.__format_number(day) + "%2F", DEFAULT_LIST_TAG_NAME,
                             DEFAULT_DATA_TAG_NAME)))
 
-
     def fetch_nexrad_file_urls(self, year, month, day, station):
         def post_processing(root, name_space):
             data = []
@@ -81,22 +77,22 @@ class NexradHandler:
                 last_modified_date_time = self.__parse_date_time(content_node.find(modified_date_time_tag_name).text)
                 data.append(NexradFileDetails(self._nexrad_url + '/' + file_path, last_modified_date_time))
             return data
-        url=self._details_fetch_base_url + str(year) + "%2F" + self.__format_number(
+
+        url = self._details_fetch_base_url + str(year) + "%2F" + self.__format_number(
             month) + "%2F" + self.__format_number(day) + "%2F" + station + "%2F"
         return self.__fetch_data_from_nexard(url, post_processing)
 
-
-
-    def fetch_closest_nexrad_file_url(self,given_date_time,station):
-        nexrad_urls=self.fetch_nexrad_file_urls(given_date_time.year,given_date_time.month,given_date_time.day,station)
-        min_time_delta=timedelta.max
-        closest_matching_nexrad_url=None
+    def fetch_closest_nexrad_file_url(self, given_date_time, station):
+        nexrad_urls = self.fetch_nexrad_file_urls(given_date_time.year, given_date_time.month, given_date_time.day,
+                                                  station)
+        min_time_delta = timedelta.max
+        closest_matching_nexrad_url = None
         for nexrad_url in nexrad_urls:
-            last_modiefied_date_time=nexrad_url.modified_date_time
-            current_time_delta=abs(given_date_time-last_modiefied_date_time)
-            if min_time_delta.total_seconds()>current_time_delta.total_seconds():
-                min_time_delta=current_time_delta
-                closest_matching_nexrad_url=nexrad_url
+            last_modiefied_date_time = nexrad_url.modified_date_time
+            current_time_delta = abs(given_date_time - last_modiefied_date_time)
+            if min_time_delta.total_seconds() > current_time_delta.total_seconds():
+                min_time_delta = current_time_delta
+                closest_matching_nexrad_url = nexrad_url
         return closest_matching_nexrad_url
 
     def __format_number(self, number):
