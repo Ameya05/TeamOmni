@@ -53,14 +53,13 @@ public class ServiceFactory {
 			serviceProvider.start();
 			Collection<ServiceInstance<InstanceDetails>> serviceInstances = serviceProvider.getAllInstances();
 			serviceInstances.stream().map(ServiceInstance::buildUriSpec).forEach((String uri) -> System.out.println(uri));
+			serviceInstances.stream().map(ServiceInstance::getPayload).map(InstanceDetails::getWorkLoad).forEach((Integer w) -> System.out.println(w));
 			Optional<ServiceInstance<InstanceDetails>> requiredServiceInstance = serviceInstances.stream().min(Comparator.comparingInt((ServiceInstance<InstanceDetails> serviceInstance) -> serviceInstance.getPayload().getWorkLoad()));
 			if (!requiredServiceInstance.isPresent()) {
 				throw new ServiceCreationException("Service Could not be found");
 			} else {
 				ServiceInstance<InstanceDetails> serviceInstance = requiredServiceInstance.get();
-				serviceInstance.getPayload().updateWorkLoad(1);
-				serviceDiscovery.updateService(serviceInstance);
-				return serviceClass.getConstructor(WebTarget.class, OrchestrationEngineValueStore.class).newInstance(client.target(serviceInstance.buildUriSpec()), orchestrationEngineValueStore);
+				return serviceClass.getConstructor(WebTarget.class, OrchestrationEngineValueStore.class, ServiceInstance.class).newInstance(client.target(serviceInstance.buildUriSpec()), orchestrationEngineValueStore, serviceInstance);
 			}
 		} catch (Exception e) {
 			throw new ServiceCreationException("Service: " + serviceClass.getName(), e);
@@ -68,13 +67,6 @@ public class ServiceFactory {
 	}
 
 	public void destroyService(Service service) throws ServiceCreationException {
-		ServiceInstance<InstanceDetails> serviceInstance = service.getServiceInstance();
-		serviceInstance.getPayload().updateWorkLoad(-1);
-		try {
-			serviceDiscovery.updateService(serviceInstance);
-		} catch (Exception e) {
-			throw new ServiceCreationException(e);
-		}
 	}
 
 	@Deprecated
