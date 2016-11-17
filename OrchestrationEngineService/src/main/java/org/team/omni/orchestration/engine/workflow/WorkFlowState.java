@@ -3,13 +3,15 @@ package org.team.omni.orchestration.engine.workflow;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.Optional;
 
 import javax.sql.DataSource;
 
+import static org.jooq.impl.DSL.*;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.impl.DSL;
 import org.team.omni.exceptions.OrchestrationEngineException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -33,17 +35,12 @@ public class WorkFlowState {
 
 	private void createEntry() {
 		try (Connection connection = dataSource.getConnection();) {
-			PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO WORK_FLOW_DETAILS (USER_ID,STATUS) VALUES(?,?)", Statement.RETURN_GENERATED_KEYS);
-			preparedStatement.setString(1, userId);
-			preparedStatement.setString(2, executionStatus.getValue());
-			int rowsUpadted = preparedStatement.executeUpdate();
-			if (rowsUpadted == 0) {
+			DSLContext create = DSL.using(connection);
+			Optional<Record> record = create.insertInto(table(name("WORK_FLOW_DETAILS")), field("USER_ID"), field("STATUS")).values(userId, executionStatus.getValue()).returning(field("ID")).fetchOptional();
+			if (record.isPresent()) {
+				setWorkFlowId(record.get().getValue(field("ID", Long.class)));
+			} else {
 				throw new OrchestrationEngineException("Work Flow Details could not be saved");
-			}
-			try (ResultSet resultSet = preparedStatement.getGeneratedKeys();) {
-				if (resultSet.next()) {
-					setWorkFlowId(resultSet.getLong(1));
-				}
 			}
 		} catch (SQLException e) {
 			throw new OrchestrationEngineException(e);
@@ -87,10 +84,8 @@ public class WorkFlowState {
 	public synchronized void setExecutionStatus(WorkFlowExecutionStatus executionStatus) {
 		this.executionStatus = executionStatus;
 		try (Connection connection = dataSource.getConnection();) {
-			PreparedStatement preparedStatement = connection.prepareStatement("UPDATE WORK_FLOW_DETAILS SET STATUS=? WHERE ID=?");
-			preparedStatement.setString(1, executionStatus.getValue());
-			preparedStatement.setLong(2, workFlowId);
-			int updateRows = preparedStatement.executeUpdate();
+			DSLContext create = DSL.using(connection);
+			int updateRows = create.update(table("WORK_FLOW_DETAILS")).set(field("STATUS"), executionStatus.toString()).where(field("ID").equal(workFlowId)).execute();
 			if (updateRows == 0) {
 				throw new OrchestrationEngineException("Work Flow Details could not be updated");
 			}

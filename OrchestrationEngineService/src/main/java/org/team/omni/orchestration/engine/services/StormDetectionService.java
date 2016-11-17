@@ -7,17 +7,19 @@ import java.text.ParseException;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
+import org.apache.curator.x.discovery.ServiceInstance;
 import org.team.omni.OrchestrationEngineUtils;
 import org.team.omni.OrchestrationEngineValueStore;
+import org.team.omni.weather.InstanceDetails;
 
 public class StormDetectionService extends Service {
 
-	public StormDetectionService(WebTarget serviceAddress, OrchestrationEngineValueStore orchestrationEngineValueStore) {
-		super(serviceAddress.path("/storm/detection"), orchestrationEngineValueStore);
+	public StormDetectionService(WebTarget serviceAddress, OrchestrationEngineValueStore orchestrationEngineValueStore,ServiceInstance<InstanceDetails> serviceInstance) {
+		super(serviceAddress.path("/storm/detection"), orchestrationEngineValueStore,serviceInstance);
 	}
 
 	public File generateKMLFile(String key) throws IOException, ParseException {
 		Response response = serviceAddress.queryParam("key", key).request().get();
-		return OrchestrationEngineUtils.saveFileFromResposne(response, orchestrationEngineValueStore.getServiceFolder());
+		return OrchestrationEngineUtils.getOrchestrationEngineUtils().saveFileFromResponse(response, orchestrationEngineValueStore.getServiceFolder());
 	}
 }

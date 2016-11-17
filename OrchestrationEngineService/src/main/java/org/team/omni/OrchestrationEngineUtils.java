@@ -14,14 +14,18 @@ import java.util.Random;
 import javax.sql.DataSource;
 import javax.ws.rs.core.Response;
 
-import org.glassfish.jersey.media.multipart.ContentDisposition;
-
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 public class OrchestrationEngineUtils {
 
+	private static final OrchestrationEngineUtils orchestrationEngineUtils = new OrchestrationEngineUtils();
+
 	private OrchestrationEngineUtils() {
+	}
+
+	public static OrchestrationEngineUtils getOrchestrationEngineUtils() {
+		return orchestrationEngineUtils;
 	}
 
 	/**
@@ -30,7 +34,7 @@ public class OrchestrationEngineUtils {
 	 * @param hikariCPConfiguration
 	 * @return
 	 */
-	public static DataSource createDataSource(Properties hikariCPConfiguration) {
+	public DataSource createDataSource(Properties hikariCPConfiguration) {
 		return new HikariDataSource(new HikariConfig(hikariCPConfiguration));
 	}
 
@@ -44,7 +48,7 @@ public class OrchestrationEngineUtils {
 	 *         been saved
 	 * @throws IOException
 	 */
-	public static File saveFile(InputStream in, String fileName) throws IOException {
+	public File saveFile(InputStream in, String fileName) throws IOException {
 		File file = new File(fileName);
 		try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file)); BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));) {
 			String output = null;
@@ -65,7 +69,7 @@ public class OrchestrationEngineUtils {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public static File saveFileFromResposne(Response response, String folder) throws IOException, ParseException {
+	public File saveFileFromResponse(Response response, String folder) throws IOException, ParseException {
 		InputStream in = (InputStream) response.getEntity();
 		// ContentDisposition contentDisposition = new
 		// ContentDisposition((String)

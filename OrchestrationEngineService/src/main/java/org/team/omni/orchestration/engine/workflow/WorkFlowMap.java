@@ -38,7 +38,6 @@ public class WorkFlowMap {
 			throw new OrchestrationEngineException("User Id could not be found: " + userId);
 		}
 		return workFlowDetails.get(userId).getLast().getWorkFlowState();
-
 	}
 
 	public static WorkFlowMap getWorkFlowMap() {

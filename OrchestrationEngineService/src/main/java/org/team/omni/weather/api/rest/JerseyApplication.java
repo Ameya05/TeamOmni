@@ -15,8 +15,8 @@ public class JerseyApplication extends ResourceConfig {
 		register(new ObjectMapperProvider());
 		register(new JacksonFeature());
 		register(new MultiPartFeature());
-		register(new WorkFlowMapBinder());
-		packages("org.team.omni.weather");
+		register(new DependencyInjectionBinder());
+		packages("org.team.omni.weather.api.rest");
 		System.out.println("Jersey Application Starting...................................................................................................................");
 	}
 

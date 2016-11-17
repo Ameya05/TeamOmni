@@ -7,16 +7,18 @@ import java.util.logging.Logger;
 
 import org.team.omni.beans.WeatherDetails;
 import org.team.omni.exceptions.OrchestrationEngineException;
+import org.team.omni.exceptions.ServiceCreationException;
 import org.team.omni.exceptions.ServiceExecutionException;
 import org.team.omni.orchestration.engine.services.DataIngestionService;
 import org.team.omni.orchestration.engine.services.ForecastTriggerService;
+import org.team.omni.orchestration.engine.services.Service;
 import org.team.omni.orchestration.engine.services.ServiceFactory;
 import org.team.omni.orchestration.engine.services.StormClusteringService;
 import org.team.omni.orchestration.engine.services.StormDetectionService;
 import org.team.omni.orchestration.engine.services.WeatherForecastExecutionService;
 
 public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetails>, Runnable {
-	
+
 	private static final Logger LOGGER = Logger.getLogger("Orchestration");
 	private ServiceFactory serviceFactory;
 	private String stationName = "";
@@ -32,13 +34,19 @@ public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetail
 		this.workFlowState = workFlowState;
 	}
 
-	public <T> T executeService(ServiceExecution<T> serviceExecution, String serviceName) {
-		workFlowState.setCurrentService(serviceName);
+	public <T> T executeService(ServiceExecution<T> serviceExecution, Service service) {
+		workFlowState.setCurrentService(service.getClass().getSimpleName());
 		try {
 			return serviceExecution.execute();
 		} catch (Exception e) {
 			workFlowState.setError(e);
 			throw new ServiceExecutionException(e);
+		} finally {
+			try {
+				ServiceFactory.getServiceFactory().destroyService(service);
+			} catch (ServiceCreationException e) {
+				throw new OrchestrationEngineException("Could not destroy the service: " + workFlowState.getCurrentService(), e);
+			}
 		}
 	}
 
@@ -52,39 +60,39 @@ public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetail
 		}
 	}
 
-	public String handleDataIngestionService() {
+	public String handleDataIngestionService() throws ServiceCreationException {
+		DataIngestionService dataIngestionService = serviceFactory.createService(DataIngestionService.class);
 		return executeService(() -> {
-			DataIngestionService dataIngestionService = serviceFactory.createService(DataIngestionService.class);
 			return dataIngestionService.constructDataFileURL(stationName, timeStamp);
-		}, DataIngestionService.class.getName());
+		}, dataIngestionService);
 	}
 
-	public File handleStormDetectionService(String key) {
+	public File handleStormDetectionService(String key) throws ServiceCreationException {
+		StormDetectionService stormDetectionService = serviceFactory.createService(StormDetectionService.class);
 		return executeService(() -> {
-			StormDetectionService stormDetectionService = serviceFactory.createService(StormDetectionService.class);
 			return stormDetectionService.generateKMLFile(key);
-		}, StormDetectionService.class.getName());
+		}, stormDetectionService);
 	}
 
-	public File handleStormClusteringService(File kmlFile) {
+	public File handleStormClusteringService(File kmlFile) throws ServiceCreationException {
+		StormClusteringService stormClusteringService = serviceFactory.createService(StormClusteringService.class);
 		return executeService(() -> {
-			StormClusteringService stormClusteringService = serviceFactory.createService(StormClusteringService.class);
 			return stormClusteringService.genrateStormClusteringFile(kmlFile);
-		}, StormClusteringService.class.getName());
+		}, stormClusteringService);
 	}
 
-	public boolean handleForecastTriggerService(File clusteringFile) {
+	public boolean handleForecastTriggerService(File clusteringFile) throws ServiceCreationException {
+		ForecastTriggerService forecastTriggerService = serviceFactory.createService(ForecastTriggerService.class);
 		return executeService(() -> {
-			ForecastTriggerService forecastTriggerService = serviceFactory.createService(ForecastTriggerService.class);
 			return forecastTriggerService.triggerWeatherForecast(clusteringFile);
-		}, ForecastTriggerService.class.getName());
+		}, forecastTriggerService);
 	}
 
-	public WeatherDetails hanldeWeatherForecastExecutionService() {
+	public WeatherDetails hanldeWeatherForecastExecutionService() throws ServiceCreationException {
+		WeatherForecastExecutionService weatherForecastExecutionService = serviceFactory.createService(WeatherForecastExecutionService.class);
 		return executeService(() -> {
-			WeatherForecastExecutionService weatherForecastExecutionService = serviceFactory.createService(WeatherForecastExecutionService.class);
 			return weatherForecastExecutionService.runWeatherForecast();
-		}, WeatherForecastExecutionService.class.getName());
+		}, weatherForecastExecutionService);
 	}
 
 	@Override
@@ -99,30 +107,33 @@ public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetail
 
 	@Override
 	public void run() {
-		LOGGER.log(Level.INFO,"==================================\nBeginning workflow for - "+ workFlowState.getUserId());
-		
-		String key = handleDataIngestionService();
-		LOGGER.log(Level.INFO,"DataIngestionService successfully executed. Key fetched: "+key);
-		
-		File kmlFile = handleStormDetectionService(key);
-		LOGGER.log(Level.INFO,"StormDetectionService successfully executed.");
-		
-		File clusteringFile = handleStormClusteringService(kmlFile);
-		LOGGER.log(Level.INFO,"StormClusteringService successfully executed.");
-		
-		boolean forecast = handleForecastTriggerService(clusteringFile);
-		LOGGER.log(Level.INFO,"ForecastTriggerService returned Storm status: "+forecast);
-		
-		if (forecast) {
-			LOGGER.log(Level.INFO,"Since storm is present, running Weather Forecast: "+forecast);
-			weatherDetails = hanldeWeatherForecastExecutionService();
-			workFlowState.setExecutionStatus(WorkFlowExecutionStatus.EXECUTION_COMPLETE);
+		try {
+			LOGGER.log(Level.INFO, "==================================\nBeginning workflow for - " + workFlowState.getUserId());
+
+			String key = handleDataIngestionService();
+			LOGGER.log(Level.INFO, "DataIngestionService successfully executed. Key fetched: " + key);
+
+			File kmlFile = handleStormDetectionService(key);
+			LOGGER.log(Level.INFO, "StormDetectionService successfully executed.");
+
+			File clusteringFile = handleStormClusteringService(kmlFile);
+			LOGGER.log(Level.INFO, "StormClusteringService successfully executed.");
+
+			boolean forecast = handleForecastTriggerService(clusteringFile);
+			LOGGER.log(Level.INFO, "ForecastTriggerService returned Storm status: " + forecast);
+			if (forecast) {
+				LOGGER.log(Level.INFO, "Since storm is present, running Weather Forecast: " + forecast);
+				weatherDetails = hanldeWeatherForecastExecutionService();
+				workFlowState.setExecutionStatus(WorkFlowExecutionStatus.EXECUTION_COMPLETE);
+			} else {
+				LOGGER.log(Level.INFO, "Since no storm is present, skipping Weather Forecast: " + forecast);
+				workFlowState.setExecutionStatus(WorkFlowExecutionStatus.EXECUTION_NOT_REQUIRED);
+			}
+		} catch (ServiceCreationException e) {
+			workFlowState.setExecutionStatus(WorkFlowExecutionStatus.EXECUTION_FAILURE);
+			LOGGER.log(Level.SEVERE, "Service Failure", e);
 		}
-		else {
-			LOGGER.log(Level.INFO,"Since no storm is present, skipping Weather Forecast: "+forecast);
-			workFlowState.setExecutionStatus(WorkFlowExecutionStatus.EXECUTION_NOT_REQUIRED);
-		}
-		
+
 	}
 
 }
