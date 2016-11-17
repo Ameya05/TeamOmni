@@ -10,7 +10,7 @@ install: true
 
 before_script:
   - wget -N https://s3-us-west-2.amazonaws.com/sga-team-omni/LoadBalanceAndServiceDiscovery-1.0.jar
-  - mvn install:install-file -Dfile=/home/ubuntu/LoadBalanceAndServiceDiscovery-1.0.jar -DgroupId=org.team.omni.weather -DartifactId=LoadBalanceAndServiceDiscovery -Dversion=1.0 -Dpackaging=jar
+  - mvn install:install-file -Dfile=LoadBalanceAndServiceDiscovery-1.0.jar -DgroupId=org.team.omni.weather -DartifactId=LoadBalanceAndServiceDiscovery -Dversion=1.0 -Dpackaging=jar
 
 script: cd OrchestrationEngineService && mvn -X clean install
 
