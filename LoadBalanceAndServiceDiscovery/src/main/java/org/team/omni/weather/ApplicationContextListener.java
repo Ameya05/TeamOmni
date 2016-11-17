@@ -42,6 +42,8 @@ public abstract class ApplicationContextListener implements ServletContextListen
 		serviceRegistration = new ServiceRegistration(curatorFramework, address, port, serviceName, servicePath, new InstanceDetails(100));
 		try {
 			serviceRegistration.registerService();
+			LoadBalancingRequestFilter.setServiceRegistration(serviceRegistration);
+			LoadBalancingResponseFilter.setServiceRegistration(serviceRegistration);
 		} catch (ServiceRegistrationException e) {
 			throw new ServiceException(e);
 		}

@@ -42,6 +42,7 @@ public class ServiceRegistration {
 			serviceDiscovery = serviceDiscoveryBuilder.basePath("services").client(curatorFramework).serializer(serializer).thisInstance(serviceInstance).build();
 			serviceDiscovery.start();
 		} catch (Exception e) {
+			throw new ServiceRegistrationException(e);
 		}
 	}
 
