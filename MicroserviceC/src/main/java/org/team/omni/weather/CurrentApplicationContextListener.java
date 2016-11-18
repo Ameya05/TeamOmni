@@ -32,8 +32,13 @@ public class CurrentApplicationContextListener extends ApplicationContextListene
 
 	@Override
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
-		System.out.println("Context Path " + servletContextEvent.getServletContext().getContextPath());
-		super.contextInitialized(servletContextEvent);
+		logger.info("Context Path " + servletContextEvent.getServletContext().getContextPath());
+		try{
+			super.contextInitialized(servletContextEvent);
+		}
+		catch(Exception e){
+			logger.error("Exception while initializing context",e);
+		}
 	}
 
 }
