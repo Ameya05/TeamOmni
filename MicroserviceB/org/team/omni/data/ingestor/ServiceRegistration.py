@@ -15,11 +15,11 @@ LOGGER = logging.getLogger('DataIngestorService')
 
 class ServiceRegistration:
 
-    def __init__(self, zk):
+    def __init__(self, zk,address,port):
         self._zk = zk
         self._service_id = str(uuid.uuid4())
         self._service_instance_node = SERVICE_NODE + "/" + self._service_id
-        self._service_instance = self.__create_default_service_instance()
+        self._service_instance = self.__create_default_service_instance(address,port)
 
 
     def register_service(self):
@@ -32,19 +32,19 @@ class ServiceRegistration:
         LOGGER.info("Registration Complete")
 
     def __get_service_instance_as_json_byte(self):
-        str.encode(json.dumps(self._service_instance))
+        return str.encode(json.dumps(self._service_instance))
 
     def update_work_load(self, work_load_change):
         work_load = self._service_instance[PAYLOAD][WORK_LOAD]
         self._service_instance[PAYLOAD][WORK_LOAD] = work_load + work_load_change
         self._zk.set(self._service_instance_node, self.__get_service_instance_as_json_byte())
 
-    def __create_default_service_instance(self):
+    def __create_default_service_instance(self,address,port):
         return {
             "name": SERVICE_NAME,
             "id": self._service_id,
-            "address": "localhost",
-            "port": 65000,
+            "address": address,
+            "port": port,
             "sslPort": None,
             "payload": {
                 "@class": "org.team.omni.weather.InstanceDetails",

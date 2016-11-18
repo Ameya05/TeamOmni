@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 from configparser import ConfigParser
 from datetime import datetime
 
@@ -28,6 +29,7 @@ def execute_flask(flask_app, default_host="0.0.0.0", default_port=65000):
                         default=default_port)
     args = parser.parse_args()
     print(args)
+    register_service(args.port)
     flask_app.run(host=args.host,port=args.port)
 
 
@@ -40,13 +42,16 @@ def fetch_zookeeper_address():
     else:
         return config["ZOOKEEPER"]["address"]
 
+service_registration=None
+
+def register_service(port):
+    zk = KazooClient(hosts=fetch_zookeeper_address())
+    zk.start()
+    service_registration = ServiceRegistration(zk,os.getenv('DOCKER_HOST','localhost'),port)
+    service_registration.register_service()
 
 
 
-zk = KazooClient(hosts=fetch_zookeeper_address())
-zk.start()
-service_registration = ServiceRegistration(zk)
-service_registration.register_service()
 
 
 
@@ -97,21 +102,20 @@ def internal_server_error(error):
     resp = make_response("Server Error", 500)
     return resp
 
-
 @app.before_request
 def before_request():
     service_registration.update_work_load(1)
 
-
 @app.after_request
-def after_request(reponse):
+def after_request(response):
     service_registration.update_work_load(-1)
-
+    return response
 
 @app.teardown_request
 def tear_down_request(exception):
     service_registration.update_work_load(-1)
 
 
+
 if __name__ == '__main__':
-    app.run()
+    execute_flask(app)
