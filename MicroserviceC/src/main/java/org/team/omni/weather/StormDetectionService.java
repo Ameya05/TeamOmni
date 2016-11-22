@@ -54,7 +54,6 @@ public class StormDetectionService {
 			a[i] = i;
 			sum += i;
 			sum -= i;
-			System.out.println(sum);
 		}
 
 		for (int i = 0; i < 200000; i++)
@@ -66,10 +65,10 @@ public class StormDetectionService {
 
 			InputStream inStream = new FileInputStream(kml);
 			out = IOUtils.toByteArray(inStream);
-			logger.info("KML file exists : return response to Ochestration Engine ");
+			//logger.info("KML file exists : return response to Ochestration Engine ");
 			return Response.ok(out, MediaType.APPLICATION_OCTET_STREAM).header("Content-Disposition", "attachment;filename=\"" + kml.getName() + "\"").build();
 		} else {
-			logger.error("KML file does not exist :  File exists? " + kml.exists());
+			//logger.error("KML file does not exist :  File exists? " + kml.exists());
 			return Response.status(503).entity("Error while fetching kml file").build();
 		}
 

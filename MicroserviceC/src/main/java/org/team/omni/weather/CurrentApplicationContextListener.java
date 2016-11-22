@@ -1,8 +1,9 @@
 package org.team.omni.weather;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.annotation.WebListener;
+import java.io.File;
 
+import javax.servlet.ServletContextEvent;
+import org.apache.log4j.Logger;
 /**
  * 
  * @author Eldho Mathulla
@@ -10,9 +11,16 @@ import javax.servlet.annotation.WebListener;
  */
 public class CurrentApplicationContextListener extends ApplicationContextListener {
 
+	static {
+		System.setProperty("my.log", System.getProperty("user.dir") + File.separator + "MicroClogs.log");
+	}
+	final static Logger logger = Logger.getLogger(CurrentApplicationContextListener.class);
+	
 	public CurrentApplicationContextListener() {
-		this.address = "localhost";
-		this.port = 8080;
+		this.address = System.getenv("DOCKER_HOST");
+		logger.info("Set this.address: "+this.address);
+		System.out.println("Set this.address: "+this.address);
+		this.port = 8081;
 		this.maxWorkLoad = 100;
 		this.serviceName = "StormDetectionService";
 	}
@@ -24,8 +32,13 @@ public class CurrentApplicationContextListener extends ApplicationContextListene
 
 	@Override
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
-		System.out.println("Conext Path " + servletContextEvent.getServletContext().getContextPath());
-		super.contextInitialized(servletContextEvent);
+		logger.info("Context Path " + servletContextEvent.getServletContext().getContextPath());
+		try{
+			super.contextInitialized(servletContextEvent);
+		}
+		catch(Exception e){
+			logger.error("Exception while initializing context",e);
+		}
 	}
 
 }
