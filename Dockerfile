@@ -1,6 +1,6 @@
 FROM python:3.5-alpine
 ARG APP_URL
-RUN curl -o app.tar.gz ${APP_URL}
+RUN curl -o app.tar.gz https://s3-us-west-2.amazonaws.com/sga-team-omni/omniDataIngestor.tar.gz
 RUN tar -zxvf app.tar.gz
 EXPOSE 65000
 WORKDIR  MicroserviceB
