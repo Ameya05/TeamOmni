@@ -2,7 +2,6 @@
 package org.team.omni.weather;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
@@ -18,8 +17,6 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 @Path("/")
 public class StormClustering {
 	
-	static { System.setProperty("my.log", System.getProperty("user.dir")
-            + File.separator + "MicroDlogs.log"); }
 	final static Logger logger = Logger.getLogger(StormClustering.class);
 	
 	@POST

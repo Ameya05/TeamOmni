@@ -3,12 +3,15 @@ package org.team.omni.weather;
 import java.io.File;
 
 import javax.servlet.ServletContextEvent;
+import javax.servlet.annotation.WebListener;
+
 import org.apache.log4j.Logger;
 /**
  * 
  * @author Ameya Advankar
  *
  */
+@WebListener
 public class ClusteringAppContextListener extends ApplicationContextListener {
 
 	static {
@@ -33,6 +36,7 @@ public class ClusteringAppContextListener extends ApplicationContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
 		logger.info("Context Path " + servletContextEvent.getServletContext().getContextPath());
+		System.out.println("Context Path " + servletContextEvent.getServletContext().getContextPath());
 		try{
 			super.contextInitialized(servletContextEvent);
 		}

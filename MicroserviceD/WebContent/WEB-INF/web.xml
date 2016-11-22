@@ -23,9 +23,6 @@
 	</servlet-mapping>
 	<context-param>
 		<param-name>zookeeper</param-name>
-		<param-value>54.70.147.185:2181</param-value>
+		<param-value>54.70.147.18:2181</param-value>
 	</context-param>
-	<listener>
-		<listener-class>org.team.omni.weather.ClusteringAppContextListener</listener-class>
-	</listener>
 </web-app>
