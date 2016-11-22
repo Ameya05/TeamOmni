@@ -14,6 +14,7 @@ LOGGER = logging.getLogger('DataIngestorService')
 
 
 class NexradFileDetails:
+
     def __init__(self, url, modified_date_time):
         self._url = url
         self._modified_date_time = modified_date_time

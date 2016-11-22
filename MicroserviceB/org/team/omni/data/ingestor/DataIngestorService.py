@@ -12,11 +12,18 @@ from kazoo.client import KazooClient
 from org.team.omni.data.ingestor.NexradHandler import NexradHandler
 from org.team.omni.data.ingestor.ServiceRegistration import ServiceRegistration
 
+UNIT_WORK_LOAD = 1
+UNIT_WORK_LOAD_DECREASE=UNIT_WORK_LOAD*-1
 
 logging.basicConfig()
+
 LOGGER = logging.getLogger('DataIngestorService')
+service_registration=None
+app = Flask(__name__)
+nexrad_handler = NexradHandler("https://noaa-nexrad-level2.s3.amazonaws.com")
 
 
+#Execute flask app taking into account the posrt
 def execute_flask(flask_app, default_host="0.0.0.0", default_port=65000):
     parser = argparse.ArgumentParser()
     parser.add_argument("-H", "--host",
@@ -42,24 +49,12 @@ def fetch_zookeeper_address():
     else:
         return config["ZOOKEEPER"]["address"]
 
-service_registration=None
 
 def register_service(port):
     zk = KazooClient(hosts=fetch_zookeeper_address())
     zk.start()
     service_registration = ServiceRegistration(zk,os.getenv('DOCKER_HOST','localhost'),port)
     service_registration.register_service()
-
-
-
-
-
-
-
-app = Flask(__name__)
-
-nexrad_handler = NexradHandler("https://noaa-nexrad-level2.s3.amazonaws.com")
-
 
 
 
@@ -104,16 +99,16 @@ def internal_server_error(error):
 
 @app.before_request
 def before_request():
-    service_registration.update_work_load(1)
+    service_registration.update_work_load(UNIT_WORK_LOAD)
 
 @app.after_request
 def after_request(response):
-    service_registration.update_work_load(-1)
+    service_registration.update_work_load(UNIT_WORK_LOAD_DECREASE)
     return response
 
 @app.teardown_request
 def tear_down_request(exception):
-    service_registration.update_work_load(-1)
+    service_registration.update_work_load(UNIT_WORK_LOAD_DECREASE)
 
 
 
