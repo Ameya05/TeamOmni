@@ -1,10 +1,13 @@
 package org.team.omni.weather;
 
+import java.util.Collection;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.apache.curator.x.discovery.ServiceDiscoveryBuilder;
 import org.apache.curator.x.discovery.ServiceInstance;
 import org.apache.curator.x.discovery.ServiceInstanceBuilder;
+import org.apache.curator.x.discovery.ServiceProvider;
 import org.apache.curator.x.discovery.UriSpec;
 import org.apache.curator.x.discovery.details.JsonInstanceSerializer;
 
@@ -41,8 +44,25 @@ public class ServiceRegistration {
 			JsonInstanceSerializer<InstanceDetails> serializer = new JsonInstanceSerializer<InstanceDetails>(InstanceDetails.class);
 			serviceDiscovery = serviceDiscoveryBuilder.basePath("services").client(curatorFramework).serializer(serializer).thisInstance(serviceInstance).build();
 			serviceDiscovery.start();
+			hasRegistered();
 		} catch (Exception e) {
 			throw new ServiceRegistrationException(e);
+		}
+	}
+
+	private void hasRegistered() throws ServiceRegistrationException {
+		long count = 0;
+		try {
+			ServiceProvider<InstanceDetails> serviceProvider = serviceDiscovery.serviceProviderBuilder().serviceName(serviceName).build();
+			serviceProvider.start();
+			Collection<ServiceInstance<InstanceDetails>> serviceInstances = serviceProvider.getAllInstances();
+			count = serviceInstances.stream().map(ServiceInstance::getId).filter((String id) -> id.equals(serviceInstance.getId())).count();
+		} catch (Exception e) {
+			throw new ServiceException("Service Registration failed: " + this.serviceName, e);
+		}
+		System.out.println(count);
+		if (count == 0) {
+			throw new ServiceRegistrationException("Service Registration failed");
 		}
 	}
 
