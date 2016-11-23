@@ -23,6 +23,9 @@
 	</servlet-mapping>
 	<context-param>
 		<param-name>zookeeper</param-name>
-		<param-value>54.70.147.18:2181</param-value>
+		<param-value>ec2-54-70-147-185.us-west-2.compute.amazonaws.com:2181</param-value>
 	</context-param>
+	<listener>
+		<listener-class>org.team.omni.weather.ClusteringApplicationContextListener</listener-class>
+	</listener>
 </web-app>

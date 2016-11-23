@@ -4,6 +4,11 @@ import java.io.File;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
+import javax.servlet.ServletContextListener;
+
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.retry.RetryNTimes;
 
 import org.apache.log4j.Logger;
 /**
@@ -12,8 +17,16 @@ import org.apache.log4j.Logger;
  *
  */
 @WebListener
-public class ClusteringAppContextListener extends ApplicationContextListener {
+public class ClusteringAppContextListener implements ServletContextListener {
 
+	private CuratorFramework curatorFramework;
+	private ServiceRegistration serviceRegistration;
+	protected String serviceName;
+	protected String servicePath;
+	protected String address;
+	protected int port;
+	protected int maxWorkLoad;
+	
 	static {
 		System.setProperty("my.log", System.getProperty("user.dir") + File.separator + "MicroDlogs.log");
 	}
@@ -30,7 +43,11 @@ public class ClusteringAppContextListener extends ApplicationContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
-		super.contextDestroyed(arg0);
+		try {
+			serviceRegistration.unregisterService();
+		} catch (ServiceRegistrationException e) {
+			throw new ServiceException(e);
+		}
 	}
 
 	@Override
@@ -38,7 +55,20 @@ public class ClusteringAppContextListener extends ApplicationContextListener {
 		logger.info("Context Path " + servletContextEvent.getServletContext().getContextPath());
 		System.out.println("Context Path " + servletContextEvent.getServletContext().getContextPath());
 		try{
-			super.contextInitialized(servletContextEvent);
+			//super.contextInitialized(servletContextEvent);
+			String zookeeperAddres = servletContextEvent.getServletContext().getInitParameter("zookeeper");
+			servicePath = servletContextEvent.getServletContext().getContextPath();
+			curatorFramework = CuratorFrameworkFactory.newClient(zookeeperAddres, new RetryNTimes(3, 1000));
+			curatorFramework.start();
+			serviceRegistration = new ServiceRegistration(curatorFramework, address, port, serviceName, servicePath, new InstanceDetails(100));
+			try {
+				serviceRegistration.registerService();
+				//LoadBalancingRequestFilter.setServiceRegistration(serviceRegistration);
+				//LoadBalancingResponseFilter.setServiceRegistration(serviceRegistration);
+			} catch (ServiceRegistrationException e) {
+				e.printStackTrace();
+				throw new ServiceException(e);
+			}
 		}
 		catch(Exception e){
 			logger.error("Exception while initializing context",e);
