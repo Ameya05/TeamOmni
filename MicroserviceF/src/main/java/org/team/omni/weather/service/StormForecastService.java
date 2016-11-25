@@ -24,7 +24,7 @@ public class StormForecastService
 	
 
 	static { System.setProperty("my.log", System.getProperty("user.dir")
-            + File.separator + "MicroFlog.log"); }
+            + File.separator + "MicroF.log"); }
 	final static Logger logger = Logger.getLogger(StormForecastService.class);
 	
 	
