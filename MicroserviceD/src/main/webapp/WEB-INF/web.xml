@@ -26,6 +26,6 @@
 		<param-value>ec2-54-70-147-185.us-west-2.compute.amazonaws.com:2181</param-value>
 	</context-param>
 	<listener>
-		<listener-class>org.team.omni.weather.ClusteringApplicationContextListener</listener-class>
+		<listener-class>org.team.omni.weather.ClusteringAppContextListener</listener-class>
 	</listener>
 </web-app>
