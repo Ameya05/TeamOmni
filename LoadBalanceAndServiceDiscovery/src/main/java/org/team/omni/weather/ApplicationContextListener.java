@@ -1,5 +1,8 @@
 package org.team.omni.weather;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -21,6 +24,8 @@ public abstract class ApplicationContextListener implements ServletContextListen
 	protected int port;
 	protected int maxWorkLoad;
 
+	private static final Logger LOGGER = Logger.getLogger(ApplicationContextListener.class.getName());
+
 	public ApplicationContextListener() {
 	}
 
@@ -35,16 +40,21 @@ public abstract class ApplicationContextListener implements ServletContextListen
 
 	@Override
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
+		LOGGER.info("Start registering");
 		String zookeeperAddres = servletContextEvent.getServletContext().getInitParameter("zookeeper");
+		LOGGER.info("Zookeeper Address: " + zookeeperAddres);
 		servicePath = servletContextEvent.getServletContext().getContextPath();
+		LOGGER.info("Service Path: " + servicePath);
 		curatorFramework = CuratorFrameworkFactory.newClient(zookeeperAddres, new RetryNTimes(3, 1000));
 		curatorFramework.start();
 		serviceRegistration = new ServiceRegistration(curatorFramework, address, port, serviceName, servicePath, new InstanceDetails(100));
 		try {
 			serviceRegistration.registerService();
+			LOGGER.info("registering completed");
 			LoadBalancingRequestFilter.setServiceRegistration(serviceRegistration);
 			LoadBalancingResponseFilter.setServiceRegistration(serviceRegistration);
 		} catch (ServiceRegistrationException e) {
+			LOGGER.log(Level.SEVERE, "Unexpected error found", e);
 			throw new ServiceException(e);
 		}
 	}
