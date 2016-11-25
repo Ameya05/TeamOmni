@@ -5,7 +5,7 @@ RUN apk add --upgrade tar
 
 RUN apk --update add wget ca-certificates
 	
-RUN wget -O jetty.tar.gz "https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.4.0.RC2/jetty-distribution-9.4.0.RC2.tar.gz" \
+RUN wget -O jetty.tar.gz "https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.3.14.v20161028/jetty-distribution-9.3.14.v20161028.tar.gz" \
 	&& mkdir 'jetty' \
 	&& tar -xvf jetty.tar.gz -C jetty --strip-components=1 
 	
