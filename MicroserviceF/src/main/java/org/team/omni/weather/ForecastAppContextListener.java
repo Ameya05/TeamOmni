@@ -12,10 +12,10 @@ import org.apache.log4j.Logger;
 public class ForecastAppContextListener extends ApplicationContextListener {
 
 	private static final String HOST_IP_STRING = "DOCKER_HOST";
-	private static final String TRIGGER_SERVICE = "ForecastTriggerService";
+	private static final String TRIGGER_SERVICE = "WeatherForecastExecutionService";
 	
 	static {
-		System.setProperty("my.log", System.getProperty("user.dir") + File.separator + "MicroE.log");
+		System.setProperty("my.log", System.getProperty("user.dir") + File.separator + "MicroF.log");
 	}
 	final static Logger logger = Logger.getLogger(ForecastAppContextListener.class);
 	
