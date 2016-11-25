@@ -12,7 +12,7 @@ before_script:
   - mvn install:install-file -Dfile=LoadBalanceAndServiceDiscovery-1.0.jar -DgroupId=org.team.omni.weather -DartifactId=LoadBalanceAndServiceDiscovery -Dversion=1.0 -Dpackaging=jar
     
 install: true
-script: cd MicroserviceF && mvn package
+script: cd MicroserviceF && mvn clean package
 
 
 before_deploy:
