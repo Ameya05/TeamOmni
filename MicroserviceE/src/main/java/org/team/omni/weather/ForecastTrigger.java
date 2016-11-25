@@ -18,14 +18,11 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 
  
 @Path("/")
-public class ForecastTrigger {
-	
-
-
+public class ForecastTrigger
+{	
 	static { System.setProperty("my.log", System.getProperty("user.dir")
-            + File.separator + "MicroElog.log"); }
+            + File.separator + "MicroE.log"); }
 	final static Logger logger = Logger.getLogger(ForecastTrigger.class);
-	
 	
 	@POST
 	@Path("/trigger")
@@ -42,7 +39,7 @@ public class ForecastTrigger {
 				builder.append(line);
 			}
 		} catch (Exception e) {
-			logger.error("StreamReaderError ");
+			logger.error("StreamReaderError ", e);
 			System.out.println("Error Parsing: - ");
 		}
 		System.out.println("Data Received: " + builder.toString());
