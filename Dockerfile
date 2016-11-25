@@ -14,5 +14,11 @@ RUN wget -O app.tar.gz ${APP_URL} \
 
 WORKDIR  jetty
 
+RUN echo '--module=logging' >> start.ini \
+	&& echo '-Dorg.eclipse.jetty.util.log.class=org.eclipse.jetty.util.log.JavaUtilLog' >> start.ini \
+  	&& echo 'jetty.logging.dir=logs' >> start.ini \
+  	&& echo 'jetty.logging.append=true' >> start.ini \
+  	&& echo 'jetty.logging.timezone=UTC' >> start.ini
+
 EXPOSE 8080
 CMD ["java","-jar","start.jar"]
