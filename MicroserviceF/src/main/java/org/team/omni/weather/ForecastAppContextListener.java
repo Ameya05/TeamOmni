@@ -23,7 +23,7 @@ public class ForecastAppContextListener extends ApplicationContextListener {
 		this.address = System.getenv(HOST_IP_STRING);
 		logger.info("Set this.address: "+this.address);
 		System.out.println("Set this.address: "+this.address);
-		this.port = 8083;
+		this.port = 8084;
 		this.maxWorkLoad = 100;
 		this.serviceName = TRIGGER_SERVICE;
 	}
