@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 public class ClusteringAppContextListener extends ApplicationContextListener {
 
 	static {
-		System.setProperty("my.log", System.getProperty("user.dir") + File.separator + "MicroDlogs.log");
+		System.setProperty("my.log", System.getProperty("user.dir") + File.separator + "MicroD.log");
 	}
 	final static Logger logger = Logger.getLogger(ClusteringAppContextListener.class);
 	
