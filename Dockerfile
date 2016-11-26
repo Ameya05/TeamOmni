@@ -1,5 +1,6 @@
 FROM python:3.5
 ARG APP_URL
+RUN apt-get install libxml2-dev libxslt1-dev python-dev
 RUN curl -o app.tar.gz https://s3-us-west-2.amazonaws.com/sga-team-omni/omniDataIngestor.tar.gz
 RUN tar -zxvf app.tar.gz
 EXPOSE 65000
