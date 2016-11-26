@@ -1,5 +1,5 @@
 import json
-from org.team.omni.data.ingestor.dataIngestor import dataIngestor
+import org.team.omni.data.ingestor.dataIngestor import dataIngestor
 from nose.tools import assert_equal
 
 app = dataIngestor.app.test_client()
