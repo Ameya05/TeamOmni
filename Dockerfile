@@ -1,6 +1,6 @@
 FROM jfloff/alpine-python:latest
 ARG APP_URL
-RUN apk --update add libxml2-dev libxslt1-dev curl ca-certificates
+RUN apk --update -no-cache add curl ca-certificates libxml2-dev libxslt-dev 
 RUN curl -o app.tar.gz https://s3-us-west-2.amazonaws.com/sga-team-omni/omniDataIngestor.tar.gz
 RUN tar -zxvf app.tar.gz
 EXPOSE 65000
