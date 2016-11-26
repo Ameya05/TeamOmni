@@ -10,12 +10,11 @@ install:
    - pip install -r "MicroserviceB/requirements.txt"
 
 script: 
-   - cd "MicroserviceB/org/team/omni/data/ingestor"
-   - python DataIngestorService.py &
+   - cd "MicroserviceB" && python dataIngestor.py &
 
 
 before_deploy:
-  - cd ../../../../../../
+  - cd ..
   - tar -cvzf omniDataIngestor.tar.gz MicroserviceB scripts appspec.yml Dockerfile || true
   - mkdir -p "s3_upload_dir"
   - mv omniDataIngestor.tar.gz s3_upload_dir/omniDataIngestor.tar.gz || true
