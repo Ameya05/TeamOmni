@@ -1,7 +1,6 @@
 import argparse
 import logging
 import os
-from logging.handlers import RotatingFileHandler
 from configparser import ConfigParser
 from datetime import datetime
 
@@ -10,16 +9,21 @@ from flask import make_response
 from flask.json import jsonify
 from kazoo.client import KazooClient
 
+from org.team.omni.data.ingestor.NexradHandler import NexradHandler
 from org.team.omni.data.ingestor.ServiceRegistration import ServiceRegistration
 
 UNIT_WORK_LOAD = 1
 UNIT_WORK_LOAD_DECREASE=UNIT_WORK_LOAD*-1
 
+logging.basicConfig()
+
+LOGGER = logging.getLogger('DataIngestorService')
 service_registration=None
 app = Flask(__name__)
+nexrad_handler = NexradHandler("https://noaa-nexrad-level2.s3.amazonaws.com")
 
 
-#Execute flask app taking into account the port
+#Execute flask app taking into account the posrt
 def execute_flask(flask_app, default_host="0.0.0.0", default_port=65000):
     parser = argparse.ArgumentParser()
     parser.add_argument("-H", "--host",
@@ -31,7 +35,7 @@ def execute_flask(flask_app, default_host="0.0.0.0", default_port=65000):
                              "[Default: %s]" % default_port, type=int,
                         default=default_port)
     args = parser.parse_args()
-    app.logger.info('args'+args)
+    print(args)
     register_service(args.port)
     flask_app.run(host=args.host,port=args.port)
 
@@ -62,13 +66,29 @@ def create_response(obj):
     '/nexrad/generate/url/<nexrad_station>/<int:month>/<int:day>/<int:year>/<int:hour>/<int:minute>/<int:seconds>',
     methods=['GET'])
 def genrate_nexrad_file_url(nexrad_station, month, day, year, hour, minute, seconds):
-    logging.getLogger().setLevel(logging.INFO)
-    app.logger.info('Initiated Microservice B with input: ' + nexrad_station + month + day + year + hour + minute + seconds)
-    s3key = ("/" + nexrad_station + "/" + month + "/" + day + "/" + year + "/" + hour + "/" + minute + "/" + seconds)
+    return create_response(
+        nexrad_handler.fetch_closest_nexrad_file_url(datetime(year, month, day, hour, minute, seconds),
+                                                     nexrad_station).url)
 
-    app.logger.info('Returning to orchestration service with s3key:'+s3key)
 
-    return s3key
+@app.route('/nexrad/fetch/years', methods=['GET'])
+def fetch_years():
+    return create_response(nexrad_handler.fetch_available_years())
+
+
+@app.route('/nexrad/fetch/months/<int:year>', methods=['GET'])
+def fetch_months(year):
+    return create_response(nexrad_handler.fetch_available_months(year))
+
+
+@app.route('/nexrad/fetch/days/<int:year>/<int:month>', methods=['GET'])
+def fetch_days(year, month):
+    return create_response(nexrad_handler.fetch_available_days(year, month))
+
+
+@app.route('/nexrad/fetch/stations/<int:year>/<int:month>/<int:day>', methods=['GET'])
+def fetch_stations(year, month, day):
+    return create_response(nexrad_handler.fetch_available_stations(year, month, day))
 
 
 @app.errorhandler(500)
