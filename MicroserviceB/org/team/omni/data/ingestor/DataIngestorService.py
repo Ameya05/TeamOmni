@@ -23,7 +23,7 @@ app = Flask(__name__)
 nexrad_handler = NexradHandler("https://noaa-nexrad-level2.s3.amazonaws.com")
 
 
-#Execute flask app taking into account the posrt
+#Execute flask app taking into account the port
 def execute_flask(flask_app, default_host="0.0.0.0", default_port=65000):
     parser = argparse.ArgumentParser()
     parser.add_argument("-H", "--host",
@@ -36,11 +36,13 @@ def execute_flask(flask_app, default_host="0.0.0.0", default_port=65000):
                         default=default_port)
     args = parser.parse_args()
     print(args)
-    register_service(args.port)
+    global service_registration
+    service_registration=register_service(args.port)
+    service_registration.register_service()
     flask_app.run(host=args.host,port=args.port)
 
 
-
+#fetch the zookeeper address from config.ini file
 def fetch_zookeeper_address():
     config = ConfigParser()
     config.read("config.ini")
@@ -49,12 +51,11 @@ def fetch_zookeeper_address():
     else:
         return config["ZOOKEEPER"]["address"]
 
-
+#create ServiceRegistartion instance and register the service
 def register_service(port):
     zk = KazooClient(hosts=fetch_zookeeper_address())
     zk.start()
-    service_registration = ServiceRegistration(zk,os.getenv('DOCKER_HOST','localhost'),port)
-    service_registration.register_service()
+    return ServiceRegistration(zk,os.getenv('DOCKER_HOST','localhost'),port)
 
 
 
