@@ -6,29 +6,34 @@ public class ServiceCreationException extends Exception {
 	 * 
 	 */
 	private static final long serialVersionUID = 6880799020172679692L;
+	private final String serviceName;
 
 	public ServiceCreationException() {
-		// TODO Auto-generated constructor stub
+		serviceName = "Unknown";
 	}
 
-	public ServiceCreationException(String message) {
-		super(message);
-		// TODO Auto-generated constructor stub
+	public ServiceCreationException(String message, String serviceName) {
+		super(message + "\nService:" + serviceName);
+		this.serviceName = serviceName;
 	}
 
-	public ServiceCreationException(Throwable cause) {
+	public ServiceCreationException(Throwable cause, String serviceName) {
 		super(cause);
-		// TODO Auto-generated constructor stub
+		this.serviceName = serviceName;
 	}
 
-	public ServiceCreationException(String message, Throwable cause) {
+	public ServiceCreationException(String message, Throwable cause, String serviceName) {
 		super(message, cause);
-		// TODO Auto-generated constructor stub
+		this.serviceName = serviceName;
 	}
 
-	public ServiceCreationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+	public ServiceCreationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace, String serviceName) {
 		super(message, cause, enableSuppression, writableStackTrace);
-		// TODO Auto-generated constructor stub
+		this.serviceName = serviceName;
+	}
+
+	public String getServiceName() {
+		return serviceName;
 	}
 
 }

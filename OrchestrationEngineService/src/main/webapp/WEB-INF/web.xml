@@ -20,6 +20,22 @@
   </listener>
   <context-param>
   	<param-name>configuration_folder</param-name>
-	<param-value>/home/ubuntu/config</param-value>
+	<param-value>D:\Documents\Projects\SGA\configuration_folder</param-value>
   </context-param>
+  <context-param>
+  	<param-name>zookeeper.address</param-name>
+  	<param-value>ec2-54-70-147-185.us-west-2.compute.amazonaws.com:2181</param-value>
+  	</context-param>
+  <context-param>
+  	<param-name>zookeper.sleeps.retries</param-name>
+  	<param-value>1000</param-value>
+  </context-param>
+  <context-param>
+  	<param-name>zookeper.retry.times</param-name>
+  	<param-value>3</param-value>
+  </context-param>
+  <context-param>
+      <param-name>isLog4jAutoInitializationDisabled</param-name>
+        <param-value>true</param-value>
+    </context-param>
 </web-app>

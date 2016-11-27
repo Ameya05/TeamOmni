@@ -1,8 +1,10 @@
 package org.team.omni.orchestration.engine.workflow;
 
-@FunctionalInterface
-public interface ServiceExecution<T> {
+import org.team.omni.orchestration.engine.services.Service;
 
-	public T execute() throws Exception;
+@FunctionalInterface
+public interface ServiceExecution<T,U extends Service> {
+
+	public T execute(U service) throws Exception;
 
 }

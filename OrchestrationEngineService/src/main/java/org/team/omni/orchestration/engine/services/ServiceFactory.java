@@ -44,10 +44,8 @@ public class ServiceFactory {
 		if (serviceDiscovery == null) {
 			throw new OrchestrationEngineException("Please set the service discovery");
 		}
+		String serviceName = serviceClass.getSimpleName();
 		try {
-			String serviceName = serviceClass.getSimpleName();
-			// =
-			// ServiceDiscoveryBuilder.builder(InstanceDetails.class).basePath("services").client(curatorFramework).build();
 			serviceDiscovery.start();
 			ServiceProvider<InstanceDetails> serviceProvider = serviceDiscovery.serviceProviderBuilder().serviceName(serviceName).build();
 			serviceProvider.start();
@@ -56,17 +54,14 @@ public class ServiceFactory {
 			serviceInstances.stream().map(ServiceInstance::getPayload).map(InstanceDetails::getWorkLoad).forEach((Integer w) -> System.out.println(w));
 			Optional<ServiceInstance<InstanceDetails>> requiredServiceInstance = serviceInstances.stream().min(Comparator.comparingInt((ServiceInstance<InstanceDetails> serviceInstance) -> serviceInstance.getPayload().getWorkLoad()));
 			if (!requiredServiceInstance.isPresent()) {
-				throw new ServiceCreationException("Service Could not be found");
+				throw new ServiceCreationException("Service Could not be found", serviceName);
 			} else {
 				ServiceInstance<InstanceDetails> serviceInstance = requiredServiceInstance.get();
 				return serviceClass.getConstructor(WebTarget.class, OrchestrationEngineValueStore.class, ServiceInstance.class).newInstance(client.target(serviceInstance.buildUriSpec()), orchestrationEngineValueStore, serviceInstance);
 			}
 		} catch (Exception e) {
-			throw new ServiceCreationException("Service: " + serviceClass.getName(), e);
+			throw new ServiceCreationException("Service: " + serviceClass.getName(), e, serviceName);
 		}
-	}
-
-	public void destroyService(Service service) throws ServiceCreationException {
 	}
 
 	@Deprecated
@@ -75,7 +70,7 @@ public class ServiceFactory {
 		if (serviceAddressDirectory.containsKey(serviceClassName)) {
 			return serviceAddressDirectory.get(serviceClassName);
 		} else {
-			throw new ServiceCreationException("Service Creation Failed for the service: " + serviceClassName);
+			throw new ServiceCreationException("Service Creation Failed for the service: " + serviceClassName, serviceClassName);
 		}
 	}
 

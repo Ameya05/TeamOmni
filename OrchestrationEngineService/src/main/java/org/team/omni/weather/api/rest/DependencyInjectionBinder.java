@@ -3,11 +3,11 @@ package org.team.omni.weather.api.rest;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.ws.rs.ext.Provider;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.team.omni.exceptions.OrchestrationEngineException;
 import org.team.omni.orchestration.engine.workflow.WorkFlowMap;
@@ -19,7 +19,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 
 @Provider
 public class DependencyInjectionBinder extends AbstractBinder {
-	private static final Logger LOGGER = Logger.getLogger("Orchestration");
+	private static final Logger LOGGER = LogManager.getLogger(DependencyInjectionBinder.class);
 	private static final String CLIENT_ID = "335496797213-lfl268trivj44l05q58ia6j33kpu16n0.apps.googleusercontent.com";
 
 	public DependencyInjectionBinder() {
@@ -36,7 +36,7 @@ public class DependencyInjectionBinder extends AbstractBinder {
 			GoogleIdTokenVerifier googleIdTokenVerifier = new GoogleIdTokenVerifier.Builder(GoogleNetHttpTransport.newTrustedTransport(), new JacksonFactory()).setAudience(Arrays.asList(CLIENT_ID)).setIssuer("accounts.google.com").build();
 			return new AuthService(googleIdTokenVerifier);
 		} catch (GeneralSecurityException | IOException e) {
-			LOGGER.log(Level.SEVERE, "Could not create Google Net Http Transport", e);
+			LOGGER.error("Could not create Google Net Http Transport", e);
 			throw new OrchestrationEngineException(e);
 		}
 	}

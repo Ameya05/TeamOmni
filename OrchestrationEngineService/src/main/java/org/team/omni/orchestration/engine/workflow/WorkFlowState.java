@@ -10,7 +10,9 @@ import javax.sql.DataSource;
 
 import static org.jooq.impl.DSL.*;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record;
+import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.team.omni.exceptions.OrchestrationEngineException;
 
@@ -18,6 +20,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class WorkFlowState {
+	private final Field<Object> userIdField = field("USER_ID");
+	private final Field<Object> statusField = field("STATUS");
+	private final Table<Record> workflowDetailsTable = table("work_flow_details");
 	private String currentService = "";
 	private String previousService = "";
 	private String errorMessage = "";
@@ -36,9 +41,10 @@ public class WorkFlowState {
 	private void createEntry() {
 		try (Connection connection = dataSource.getConnection();) {
 			DSLContext create = DSL.using(connection);
-			Optional<Record> record = create.insertInto(table(name("WORK_FLOW_DETAILS")), field("USER_ID"), field("STATUS")).values(userId, executionStatus.getValue()).returning(field("ID")).fetchOptional();
+			Optional<Record> record = create.insertInto(workflowDetailsTable, userIdField, statusField).values(userId, executionStatus.getValue()).returning(field("ID")).fetchOptional();
 			if (record.isPresent()) {
-				setWorkFlowId(record.get().getValue(field("ID", Long.class)));
+				long id=record.get().getValue(field("ID", Integer.class))*1L;
+				setWorkFlowId(id);
 			} else {
 				throw new OrchestrationEngineException("Work Flow Details could not be saved");
 			}
@@ -85,7 +91,7 @@ public class WorkFlowState {
 		this.executionStatus = executionStatus;
 		try (Connection connection = dataSource.getConnection();) {
 			DSLContext create = DSL.using(connection);
-			int updateRows = create.update(table("WORK_FLOW_DETAILS")).set(field("STATUS"), executionStatus.toString()).where(field("ID").equal(workFlowId)).execute();
+			int updateRows = create.update(workflowDetailsTable).set(statusField, executionStatus.toString()).where(field("ID").equal(workFlowId)).execute();
 			if (updateRows == 0) {
 				throw new OrchestrationEngineException("Work Flow Details could not be updated");
 			}

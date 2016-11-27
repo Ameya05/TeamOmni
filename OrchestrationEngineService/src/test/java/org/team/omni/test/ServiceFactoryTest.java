@@ -11,6 +11,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.team.omni.exceptions.ServiceCreationException;
+import org.team.omni.orchestration.engine.services.DataIngestionService;
 import org.team.omni.orchestration.engine.services.ServiceFactory;
 import org.team.omni.orchestration.engine.services.StormDetectionService;
 import org.team.omni.weather.InstanceDetails;
@@ -34,8 +35,8 @@ public class ServiceFactoryTest {
 
 	@Test
 	public void test() throws ServiceCreationException {
-		StormDetectionService stormDetectionService = serviceFactory.createService(StormDetectionService.class);
-		assertNotNull(stormDetectionService);
+		DataIngestionService dataIngestionService = serviceFactory.createService(DataIngestionService.class);
+		assertNotNull(dataIngestionService);
 	}
 
 }

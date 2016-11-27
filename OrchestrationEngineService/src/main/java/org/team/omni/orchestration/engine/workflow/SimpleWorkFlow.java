@@ -2,9 +2,9 @@ package org.team.omni.orchestration.engine.workflow;
 
 import java.io.File;
 import java.time.LocalDateTime;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.team.omni.beans.WeatherDetails;
 import org.team.omni.exceptions.OrchestrationEngineException;
 import org.team.omni.exceptions.ServiceCreationException;
@@ -19,7 +19,7 @@ import org.team.omni.orchestration.engine.services.WeatherForecastExecutionServi
 
 public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetails>, Runnable {
 
-	private static final Logger LOGGER = Logger.getLogger("Orchestration");
+	private static final Logger LOGGER = LogManager.getLogger(SimpleWorkFlow.class);
 	private ServiceFactory serviceFactory;
 	private String stationName = "";
 	private LocalDateTime timeStamp;
@@ -34,20 +34,26 @@ public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetail
 		this.workFlowState = workFlowState;
 	}
 
-	public <T> T executeService(ServiceExecution<T> serviceExecution, Service service) {
-		workFlowState.setCurrentService(service.getClass().getSimpleName());
-		try {
-			return serviceExecution.execute();
-		} catch (Exception e) {
-			workFlowState.setError(e);
-			throw new ServiceExecutionException(e);
-		} finally {
+	public <T, U extends Service> T executeService(ServiceExecution<T, U> serviceExecution, Class<U> serviceClass) {
+		String serviceName = serviceClass.getSimpleName();
+		workFlowState.setCurrentService(serviceName);
+		int tries = 0;
+		do {
+			tries++;
+			LOGGER.info("Trying " + tries + " .............");
 			try {
-				ServiceFactory.getServiceFactory().destroyService(service);
-			} catch (ServiceCreationException e) {
-				throw new OrchestrationEngineException("Could not destroy the service: " + workFlowState.getCurrentService(), e);
+				U serviceInstance = serviceFactory.createService(serviceClass);
+				return serviceExecution.execute(serviceInstance);
+			} catch (Exception e) {
+				if (tries >= 3) {
+					workFlowState.setError(e);
+					throw new ServiceExecutionException(e);
+				} else {
+					LOGGER.error("Unxpected issue encountered", e);
+				}
 			}
-		}
+		} while (tries < 3);
+		throw new ServiceExecutionException("The service " + serviceName + " execution could not be completed due to unknown reasons");
 	}
 
 	@Override
@@ -61,38 +67,33 @@ public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetail
 	}
 
 	public String handleDataIngestionService() throws ServiceCreationException {
-		DataIngestionService dataIngestionService = serviceFactory.createService(DataIngestionService.class);
-		return executeService(() -> {
+		return executeService((DataIngestionService dataIngestionService) -> {
 			return dataIngestionService.constructDataFileURL(stationName, timeStamp);
-		}, dataIngestionService);
+		}, DataIngestionService.class);
 	}
 
 	public File handleStormDetectionService(String key) throws ServiceCreationException {
-		StormDetectionService stormDetectionService = serviceFactory.createService(StormDetectionService.class);
-		return executeService(() -> {
+		return executeService((StormDetectionService stormDetectionService) -> {
 			return stormDetectionService.generateKMLFile(key);
-		}, stormDetectionService);
+		}, StormDetectionService.class);
 	}
 
 	public File handleStormClusteringService(File kmlFile) throws ServiceCreationException {
-		StormClusteringService stormClusteringService = serviceFactory.createService(StormClusteringService.class);
-		return executeService(() -> {
+		return executeService((StormClusteringService stormClusteringService) -> {
 			return stormClusteringService.genrateStormClusteringFile(kmlFile);
-		}, stormClusteringService);
+		}, StormClusteringService.class);
 	}
 
 	public boolean handleForecastTriggerService(File clusteringFile) throws ServiceCreationException {
-		ForecastTriggerService forecastTriggerService = serviceFactory.createService(ForecastTriggerService.class);
-		return executeService(() -> {
+		return executeService((ForecastTriggerService forecastTriggerService) -> {
 			return forecastTriggerService.triggerWeatherForecast(clusteringFile);
-		}, forecastTriggerService);
+		}, ForecastTriggerService.class);
 	}
 
 	public WeatherDetails hanldeWeatherForecastExecutionService() throws ServiceCreationException {
-		WeatherForecastExecutionService weatherForecastExecutionService = serviceFactory.createService(WeatherForecastExecutionService.class);
-		return executeService(() -> {
+		return executeService((WeatherForecastExecutionService weatherForecastExecutionService) -> {
 			return weatherForecastExecutionService.runWeatherForecast();
-		}, weatherForecastExecutionService);
+		}, WeatherForecastExecutionService.class);
 	}
 
 	@Override
@@ -108,30 +109,30 @@ public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetail
 	@Override
 	public void run() {
 		try {
-			LOGGER.log(Level.INFO, "==================================\nBeginning workflow for - " + workFlowState.getUserId());
+			LOGGER.info("==================================\nBeginning workflow for - " + workFlowState.getUserId());
 
 			String key = handleDataIngestionService();
-			LOGGER.log(Level.INFO, "DataIngestionService successfully executed. Key fetched: " + key);
+			LOGGER.info("DataIngestionService successfully executed. Key fetched: " + key);
 
 			File kmlFile = handleStormDetectionService(key);
-			LOGGER.log(Level.INFO, "StormDetectionService successfully executed.");
+			LOGGER.info("StormDetectionService successfully executed.");
 
 			File clusteringFile = handleStormClusteringService(kmlFile);
-			LOGGER.log(Level.INFO, "StormClusteringService successfully executed.");
+			LOGGER.info("StormClusteringService successfully executed.");
 
 			boolean forecast = handleForecastTriggerService(clusteringFile);
-			LOGGER.log(Level.INFO, "ForecastTriggerService returned Storm status: " + forecast);
+			LOGGER.info("ForecastTriggerService returned Storm status: " + forecast);
 			if (forecast) {
-				LOGGER.log(Level.INFO, "Since storm is present, running Weather Forecast: " + forecast);
+				LOGGER.info("Since storm is present, running Weather Forecast: " + forecast);
 				weatherDetails = hanldeWeatherForecastExecutionService();
 				workFlowState.setExecutionStatus(WorkFlowExecutionStatus.EXECUTION_COMPLETE);
 			} else {
-				LOGGER.log(Level.INFO, "Since no storm is present, skipping Weather Forecast: " + forecast);
+				LOGGER.info("Since no storm is present, skipping Weather Forecast: " + forecast);
 				workFlowState.setExecutionStatus(WorkFlowExecutionStatus.EXECUTION_NOT_REQUIRED);
 			}
 		} catch (ServiceCreationException e) {
 			workFlowState.setExecutionStatus(WorkFlowExecutionStatus.EXECUTION_FAILURE);
-			LOGGER.log(Level.SEVERE, "Service Failure", e);
+			LOGGER.error("Workflow Execution Failure", e);
 		}
 
 	}
