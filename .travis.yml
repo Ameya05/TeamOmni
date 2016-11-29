@@ -6,7 +6,7 @@ sudo: false
 
 branches:
   only:
-    - feature-microservice-C
+    - milestone3-microservice-C
 install: true
 
 before_script:
@@ -37,7 +37,7 @@ deploy:
     skip_cleanup: true
     on:
       repo: airavata-courses/TeamOmni
-      branch: feature-microservice-C
+      branch: milestone3-microservice-C
   - provider: codedeploy
     access_key_id: $ARTIFACTS_KEY
     secret_access_key: $ARTIFACTS_SECRET
@@ -45,8 +45,8 @@ deploy:
     key: omniStormDetector.tar.gz
     bundle_type: tgz
     application: SGA-TeamOmni
-    deployment_group: SGA-TeamOmni
+    deployment_group: SGA-TeamOmniProduction
     region: us-east-1
     on:
       repo: airavata-courses/TeamOmni
-      branch: feature-microservice-C
+      branch: milestone3-microservice-C
