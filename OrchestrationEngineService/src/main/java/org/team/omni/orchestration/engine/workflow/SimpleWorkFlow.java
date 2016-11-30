@@ -2,9 +2,9 @@ package org.team.omni.orchestration.engine.workflow;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.team.omni.beans.WeatherDetails;
 import org.team.omni.exceptions.OrchestrationEngineException;
 import org.team.omni.exceptions.ServiceCreationException;
@@ -19,7 +19,7 @@ import org.team.omni.orchestration.engine.services.WeatherForecastExecutionServi
 
 public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetails>, Runnable {
 
-	private static final Logger LOGGER = LogManager.getLogger(SimpleWorkFlow.class);
+	private static final Logger LOGGER = Logger.getLogger("Orchestration");
 	private ServiceFactory serviceFactory;
 	private String stationName = "";
 	private LocalDateTime timeStamp;
@@ -49,7 +49,7 @@ public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetail
 					workFlowState.setError(e);
 					throw new ServiceExecutionException(e);
 				} else {
-					LOGGER.error("Unxpected issue encountered", e);
+					LOGGER.log(Level.SEVERE, "Unexpected error", e);
 				}
 			}
 		} while (tries < 3);
@@ -132,7 +132,7 @@ public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetail
 			}
 		} catch (ServiceCreationException e) {
 			workFlowState.setExecutionStatus(WorkFlowExecutionStatus.EXECUTION_FAILURE);
-			LOGGER.error("Workflow Execution Failure", e);
+			LOGGER.log(Level.SEVERE, "Workflow Execution Failure", e);
 		}
 
 	}

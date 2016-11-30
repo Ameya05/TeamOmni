@@ -3,7 +3,13 @@ package org.team.omni.weather.api.rest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Properties;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -15,19 +21,8 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.apache.curator.x.discovery.ServiceDiscoveryBuilder;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.appender.ConsoleAppender;
-import org.apache.logging.log4j.core.config.Configurator;
-import org.apache.logging.log4j.core.config.builder.api.AppenderComponentBuilder;
-import org.apache.logging.log4j.core.config.builder.api.ComponentBuilder;
-import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
-import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
-import org.apache.logging.log4j.core.config.builder.api.LayoutComponentBuilder;
-import org.apache.logging.log4j.core.config.builder.api.RootLoggerComponentBuilder;
-import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
 import org.team.omni.OrchestrationEngineUtils;
+import org.team.omni.OrchestrationEngineValueStore;
 import org.team.omni.exceptions.OrchestrationEngineException;
 import org.team.omni.orchestration.engine.services.ServiceFactory;
 import org.team.omni.orchestration.engine.workflow.WorkFlowStateFactory;
@@ -38,6 +33,7 @@ public class WebApplicationInitializer implements ServletContextListener {
 	private static final String ZOOKEPER_SLEEPS_RETRIES = "zookeper.sleeps.retries";
 	private static final String ZOOKEPER_RETRY_TIMES = "zookeper.retry.times";
 	private static final String ZOOKEEPER_ADDRESS = "zookeeper.address";
+	private static final Logger LOGGER = Logger.getLogger("Orchestration");
 	private CuratorFramework curatorFramework;
 	private ServiceDiscovery<InstanceDetails> serviceDiscovery;
 	private DataSource dataSource;
@@ -54,12 +50,16 @@ public class WebApplicationInitializer implements ServletContextListener {
 		try {
 			File logsFolder = new File(configFolderName + "/logs");
 			logsFolder.mkdirs();
-			configureLogs(logsFolder);
+			FileHandler fileHandler = new FileHandler(logsFolder.getAbsolutePath() + "/" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss")) + ".log");
+			fileHandler.setFormatter(new SimpleFormatter());
+			LOGGER.addHandler(fileHandler);
+			LOGGER.setLevel(Level.INFO);
 			props.load(new FileInputStream(propFile));
 			hikariCPConfig.load(new FileInputStream(hikariCPConfigFile));
 		} catch (SecurityException | IOException e) {
 			throw new OrchestrationEngineException(e);
 		}
+		OrchestrationEngineValueStore.getOrchestrationEngineValueStore().setServiceFolder(configFolderName);
 		dataSource = OrchestrationEngineUtils.getOrchestrationEngineUtils().createDataSource(hikariCPConfig);
 		if (!props.containsKey(ZOOKEEPER_ADDRESS)) {
 			throw new OrchestrationEngineException("Zookeeper Address is not set");
@@ -77,30 +77,6 @@ public class WebApplicationInitializer implements ServletContextListener {
 		WorkFlowStateFactory.getWorkFlowStateFactory().setDataSource(dataSource);
 		serviceDiscovery = ServiceDiscoveryBuilder.builder(InstanceDetails.class).basePath("services").client(curatorFramework).build();
 		serviceFactory.setServiceDiscovery(serviceDiscovery);
-	}
-
-	private void configureLogs(File logsFolder) {
-		String logFolderName = logsFolder.getAbsolutePath();
-		ConfigurationBuilder<BuiltConfiguration> configurationBuilder = ConfigurationBuilderFactory.newConfigurationBuilder();
-		configurationBuilder.setStatusLevel(Level.INFO);
-		configurationBuilder.setConfigurationName("Builder");
-		ComponentBuilder<?> triggeringPolicy = configurationBuilder.newComponent("Policies").addComponent(configurationBuilder.newComponent("CronTriggeringPolicy").addAttribute("schedule", "0 0 0 * * ?")).addComponent(configurationBuilder.newComponent("SizeBasedTriggeringPolicy").addAttribute("size", "2M"));
-		AppenderComponentBuilder rollingFileAppenderComponentBuilder = configurationBuilder.newAppender("rolling", "RollingFile");
-		LayoutComponentBuilder layoutComponentBuilder = configurationBuilder.newLayout("PatternLayout");
-		layoutComponentBuilder.addAttribute("pattern", "%d [%t] %-5level: %msg%n").addAttribute("alwaysWriteExceptions", true);
-		rollingFileAppenderComponentBuilder.add(layoutComponentBuilder).addAttribute("fileName", logFolderName + "/OrchestrationEngine.log");
-		rollingFileAppenderComponentBuilder.addAttribute("filePattern", logFolderName + "/archive/orchestration-%d{MM-dd-yyyy}.log.gz");
-		rollingFileAppenderComponentBuilder.addComponent(triggeringPolicy);
-		AppenderComponentBuilder consoleAppenderComponentBuilder = configurationBuilder.newAppender("Stdout", "CONSOLE").addAttribute("target", ConsoleAppender.Target.SYSTEM_OUT);
-		consoleAppenderComponentBuilder.add(layoutComponentBuilder);
-		RootLoggerComponentBuilder rootLoggerComponentBuilder = configurationBuilder.newRootLogger(Level.INFO);
-		rootLoggerComponentBuilder.addComponent(rootLoggerComponentBuilder).addComponent(consoleAppenderComponentBuilder).add(configurationBuilder.newAppenderRef("Stdout"));
-		configurationBuilder.add(rollingFileAppenderComponentBuilder).add(consoleAppenderComponentBuilder).add(rootLoggerComponentBuilder);
-		System.out.println("Testing-1");
-		BuiltConfiguration builtConfiguration = configurationBuilder.build();
-		LoggerContext loggerContext = Configurator.initialize(builtConfiguration);
-		LogManager.setFactory(new DefaultLoggerContextFactory(loggerContext));
-		System.out.println("Testing-Last");
 	}
 
 	@Override
