@@ -1,16 +1,14 @@
 package org.team.omni.weather.api.rest;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-
-
 @Provider
 public class ExceptionMapper implements javax.ws.rs.ext.ExceptionMapper<Exception> {
-	private static final Logger LOGGER = LogManager.getLogger(ExceptionMapper.class);
+	private static final Logger LOGGER = Logger.getLogger("Orchestration");
 	private static long ERROR_ID = 100001;
 
 	public ExceptionMapper() {
@@ -19,7 +17,7 @@ public class ExceptionMapper implements javax.ws.rs.ext.ExceptionMapper<Exceptio
 	@Override
 	public Response toResponse(Exception exception) {
 		String errorID = "OE" + getERROR_ID();
-		LOGGER.error( "Error ID: " + errorID + "Exception Thrown: " + exception.getMessage(), exception);
+		LOGGER.log(Level.SEVERE, "Error ID: " + errorID + "Exception Thrown: " + exception.getMessage(), exception);
 		return Response.serverError().entity("Error ID: " + errorID).build();
 	}
 
