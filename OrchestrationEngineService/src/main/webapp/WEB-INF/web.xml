@@ -20,7 +20,7 @@
   </listener>
   <context-param>
   	<param-name>configuration_folder</param-name>
-	<param-value>D:\Documents\Projects\SGA\configuration_folder</param-value>
+	<param-value>/home/ubuntu/config</param-value>
   </context-param>
   <context-param>
   	<param-name>zookeeper.address</param-name>
