@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.team.omni.exceptions.ServiceCreationException;
 import org.team.omni.orchestration.engine.services.DataIngestionService;
 import org.team.omni.orchestration.engine.services.ServiceFactory;
-import org.team.omni.orchestration.engine.services.StormDetectionService;
+import org.team.omni.orchestration.engine.workflow.WorkFlowState;
 import org.team.omni.weather.InstanceDetails;
 
 public class ServiceFactoryTest {
@@ -35,7 +35,7 @@ public class ServiceFactoryTest {
 
 	@Test
 	public void test() throws ServiceCreationException {
-		DataIngestionService dataIngestionService = serviceFactory.createService(DataIngestionService.class);
+		DataIngestionService dataIngestionService = serviceFactory.createService(DataIngestionService.class,new WorkFlowState(null, null, 0));
 		assertNotNull(dataIngestionService);
 	}
 
