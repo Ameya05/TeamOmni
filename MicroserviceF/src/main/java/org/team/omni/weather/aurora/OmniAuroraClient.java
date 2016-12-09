@@ -91,14 +91,14 @@ public class OmniAuroraClient {
 		
 		UUID uuid = UUID.randomUUID();
 		logger.info("Inside OmniAuroraClient.createJob()");
-		JobKeyBean jobKey = new JobKeyBean("devel", "team-omni", "omni_wrf_"+uuid);
-		IdentityBean owner = new IdentityBean("centos");
+		JobKeyBean jobKey = new JobKeyBean("devel", "team-omni", "omni_wrf");
+		IdentityBean owner = new IdentityBean("team-omni");
 		
 		ProcessBean proc1 = new ProcessBean("process_1", "docker run -it --volumes-from wpsgeog --volumes-from wrfinputsandy -v ~/wrfoutput:/wrfoutput --name ncarwrfsandy bigwxwrf/ncar-wrf /wrf/run-wrf", false);
 		Set<ProcessBean> processes = new HashSet<>();
 		processes.add(proc1);
 		
-		ResourceBean resources = new ResourceBean(0.2, 8, 1);
+		ResourceBean resources = new ResourceBean(0.2, 200, 200);
 		
 		TaskConfigBean taskConfig = new TaskConfigBean("run_forecast_task", processes, resources);
 		JobConfigBean jobConfig = new JobConfigBean(jobKey, owner, taskConfig, "example");
