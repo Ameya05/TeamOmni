@@ -18,9 +18,12 @@
   <listener>
   	<listener-class>org.team.omni.weather.api.rest.WebApplicationInitializer</listener-class>
   </listener>
+  <listener>
+  	<listener-class>org.team.omni.weather.api.services.SessionListener</listener-class>
+  </listener>
   <context-param>
   	<param-name>configuration_folder</param-name>
-	<param-value>/home/ubuntu/config</param-value>
+	<param-value>D:\Documents\Projects\SGA\configuration_folder</param-value>
   </context-param>
   <context-param>
   	<param-name>zookeeper.address</param-name>
@@ -38,4 +41,7 @@
       <param-name>isLog4jAutoInitializationDisabled</param-name>
         <param-value>true</param-value>
     </context-param>
+    <session-config>
+		<session-timeout>20</session-timeout>
+	</session-config>
 </web-app>
