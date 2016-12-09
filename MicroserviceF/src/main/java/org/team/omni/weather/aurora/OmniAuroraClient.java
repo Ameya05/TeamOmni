@@ -2,6 +2,7 @@ package org.team.omni.weather.aurora;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.team.omni.weather.aurora.client.AuroraThriftClient;
 import org.team.omni.weather.aurora.bean.IdentityBean;
@@ -21,12 +22,19 @@ import org.team.omni.weather.aurora.client.sdk.Response;
 import org.team.omni.weather.aurora.client.sdk.TaskConfig;
 import org.team.omni.weather.aurora.utils.AuroraThriftClientUtil;
 import org.team.omni.weather.aurora.utils.Constants;
+import org.team.omni.weather.mesos.MesosService;
 import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
 
 public class OmniAuroraClient {
 
 	final static Logger logger = Logger.getLogger(OmniAuroraClient.class);
+	private MesosService mesosService;
+	
+	public OmniAuroraClient(MesosService mesosService)
+	{
+		this.mesosService = mesosService;
+	}
 	
 	/** The properties. */
 	
@@ -36,7 +44,7 @@ public class OmniAuroraClient {
 	 * @param client the client
 	 * @return the job summary
 	 */
-	public static void getJobSummary(ReadOnlyScheduler.Client client) 
+	public void getJobSummary(ReadOnlyScheduler.Client client) 
 	{
 		try 
 		{
@@ -79,19 +87,20 @@ public class OmniAuroraClient {
 		}
 	}
 	
-	public static void createJob() throws Exception {
+	public void createJob() throws Exception {
 		
+		UUID uuid = UUID.randomUUID();
 		logger.info("Inside OmniAuroraClient.createJob()");
-		JobKeyBean jobKey = new JobKeyBean("devel", "team-omni", "hello_world");
+		JobKeyBean jobKey = new JobKeyBean("devel", "team-omni", "omni_wrf_"+uuid);
 		IdentityBean owner = new IdentityBean("centos");
 		
-		ProcessBean proc1 = new ProcessBean("process_1", "echo 'hello_world'", false);
+		ProcessBean proc1 = new ProcessBean("process_1", "docker run -it --volumes-from wpsgeog --volumes-from wrfinputsandy -v ~/wrfoutput:/wrfoutput --name ncarwrfsandy bigwxwrf/ncar-wrf /wrf/run-wrf", false);
 		Set<ProcessBean> processes = new HashSet<>();
 		processes.add(proc1);
 		
 		ResourceBean resources = new ResourceBean(0.2, 8, 1);
 		
-		TaskConfigBean taskConfig = new TaskConfigBean("hello_world_task", processes, resources);
+		TaskConfigBean taskConfig = new TaskConfigBean("run_forecast_task", processes, resources);
 		JobConfigBean jobConfig = new JobConfigBean(jobKey, owner, taskConfig, "example");
 		
 		String executorConfigJson = AuroraThriftClientUtil.getExecutorConfigJson(jobConfig);

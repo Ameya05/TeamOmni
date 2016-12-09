@@ -18,7 +18,7 @@ import org.team.omni.weather.aurora.utils.Constants;
 import org.team.omni.weather.model.WeatherDetails;
 
 public class MesosService implements Runnable {
-
+	
 	private List<EventOutput> evenOutputs = new ArrayList<>();
 	private Thread mesosServiceThread;
 	private static final Logger logger = Logger.getLogger(MesosService.class);
@@ -51,7 +51,7 @@ public class MesosService implements Runnable {
 	 * Writing the status
 	 * @param status
 	 */
-	private void writeStatus(String status) {
+	public void writeStatus(String status) {
 		outputEvent(status, "status");
 	}
 
@@ -59,7 +59,7 @@ public class MesosService implements Runnable {
 	 * Writing the result 
 	 * @param weatherForecast
 	 */
-	private void writeResult(WeatherDetails weatherForecast) {
+	public void writeResult(WeatherDetails weatherForecast) {
 		outputEvent(weatherForecast, "result");
 	}
 
@@ -78,8 +78,10 @@ public class MesosService implements Runnable {
 			String auroraPort = properties.getProperty(Constants.AURORA_SCHEDULER_PORT);
 			omniAuroraClient = AuroraSchedulerClientFactory.createReadOnlySchedulerClient(MessageFormat.format(Constants.AURORA_SCHEDULER_CONNECTION_URL, auroraHost, auroraPort));
 			
+			OmniAuroraClient omniAuroraClient = new OmniAuroraClient(this);
+			
 			logger.info("Done with creating Aurora Client");
-			OmniAuroraClient.createJob();
+			omniAuroraClient.createJob();
 			logger.info("Done with creating Aurora Job");
 			
 			WeatherDetails forecast = new WeatherDetails();
@@ -90,13 +92,17 @@ public class MesosService implements Runnable {
 			forecast.setWindSpeedVal(10);
 
 			logger.info("Returning Response to Orchestration Engine");
-			writeStatus("Result /incomn=ing");
+			writeStatus("Result incomning");
 			writeResult(forecast);
 			writeStatus("Resf");
 		} catch (IOException e) {
 			logger.error("IOException while getting Aurora Scheduler property file",e);
-		} catch (Exception e) {
+			writeStatus("Exception while reading "+Constants.AURORA_SCHEDULER_PROP_FILE+" file");
+		}
+		catch (Exception e) {
 			logger.error("Exception encountered while running MesosService",e);
+			writeStatus("Exception encountered while running MesosService");
+			writeResult(null);
 		} finally {
 			evenOutputs.forEach((EventOutput evenOutput) -> closeEventOutput(evenOutput));
 		}
