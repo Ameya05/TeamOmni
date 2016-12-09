@@ -12,11 +12,19 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.team.omni.DataHolder;
+import org.team.omni.beans.WeatherDetails;
+import org.team.omni.orchestration.engine.workflow.OrchestrationEngineWorkFlow;
 import org.team.omni.orchestration.engine.workflow.WorkFlowExecutionStatus;
 import org.team.omni.orchestration.engine.workflow.WorkFlowMap;
 import org.team.omni.orchestration.engine.workflow.WorkFlowState;
 
-@Path("/")
+/**
+ * 
+ * @author Eldho Mathulla
+ *
+ */
+@Path("/{parameter: services|test}")
 public class OrchestrationService {
 
 	@Inject
@@ -32,10 +40,33 @@ public class OrchestrationService {
 	}
 
 	@GET
-	@Path("/queryStatus/{id}")
+	@Path("/queryStatus/{user_id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public WorkFlowState queryStatus(@PathParam("id") String id) {
-		return workFlowMap.fetchWorkFlowState(id);
+	public DataHolder queryStatus(@PathParam("user_id") String userID) {
+		OrchestrationEngineWorkFlow<WeatherDetails> orchestrationEngineWorkFlow = workFlowMap.fetchLatestWorkFlow(userID);
+		return createDataHolder(orchestrationEngineWorkFlow);
+	}
+
+	@GET
+	@Path("/queryStatus/{user_id}/{work_flow_id}")
+	public DataHolder queryStatus(@PathParam("user_id") String userID, @PathParam("work_flow_id") int workFlowId) {
+		return createDataHolder(workFlowMap.fetchWorkFlow(userID, workFlowId));
+	}
+
+	@GET
+	@Path("/fetch/workflows/{user_id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public DataHolder fetchWorkFlowIds(@PathParam("user_id") String userID) {
+		return new DataHolder(workFlowMap.fetchWorkFlowIds(userID));
+	}
+
+	private DataHolder createDataHolder(OrchestrationEngineWorkFlow<WeatherDetails> workFlow) {
+		WorkFlowState workFlowState = workFlow.getWorkFlowState();
+		if (workFlowState.getExecutionStatus() == WorkFlowExecutionStatus.EXECUTION_COMPLETE) {
+			return new DataHolder(workFlow.fetchResult(), "result");
+		} else {
+			return new DataHolder(workFlowState, "status");
+		}
 	}
 
 }

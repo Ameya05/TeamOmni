@@ -21,11 +21,14 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.apache.curator.x.discovery.ServiceDiscoveryBuilder;
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.team.omni.OrchestrationEngineUtils;
 import org.team.omni.OrchestrationEngineValueStore;
 import org.team.omni.exceptions.OrchestrationEngineException;
 import org.team.omni.orchestration.engine.services.ServiceFactory;
-import org.team.omni.orchestration.engine.workflow.WorkFlowStateFactory;
+import org.team.omni.orchestration.engine.workflow.WorkFlowMap;
 import org.team.omni.weather.InstanceDetails;
 
 @WebListener
@@ -61,20 +64,20 @@ public class WebApplicationInitializer implements ServletContextListener {
 		}
 		OrchestrationEngineValueStore.getOrchestrationEngineValueStore().setServiceFolder(configFolderName);
 		dataSource = OrchestrationEngineUtils.getOrchestrationEngineUtils().createDataSource(hikariCPConfig);
+		DSLContext create = DSL.using(dataSource, SQLDialect.POSTGRES_9_3);
+		WorkFlowMap.createDefaultWorkFlow(create);
 		if (!props.containsKey(ZOOKEEPER_ADDRESS)) {
 			throw new OrchestrationEngineException("Zookeeper Address is not set");
 		} else if (!props.containsKey(ZOOKEPER_RETRY_TIMES)) {
 			throw new OrchestrationEngineException("Zookeeper Retry Times is not set");
 		} else if (!props.containsKey(ZOOKEPER_SLEEPS_RETRIES)) {
 			throw new OrchestrationEngineException("Zookeeper Retry Sleep time is not set");
-
 		}
 		String zookeeperAddress = props.getProperty(ZOOKEEPER_ADDRESS);
 		int zookeeperRetryTimes = Integer.parseInt(props.getProperty(ZOOKEPER_RETRY_TIMES));
 		int zookeeperSleepRetryTime = Integer.parseInt(props.getProperty(ZOOKEPER_SLEEPS_RETRIES));
 		curatorFramework = CuratorFrameworkFactory.newClient(zookeeperAddress, new RetryNTimes(zookeeperRetryTimes, zookeeperSleepRetryTime));
 		curatorFramework.start();
-		WorkFlowStateFactory.getWorkFlowStateFactory().setDataSource(dataSource);
 		serviceDiscovery = ServiceDiscoveryBuilder.builder(InstanceDetails.class).basePath("services").client(curatorFramework).build();
 		serviceFactory.setServiceDiscovery(serviceDiscovery);
 	}

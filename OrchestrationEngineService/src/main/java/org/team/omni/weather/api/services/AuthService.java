@@ -9,7 +9,6 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 
-
 /**
  * 
  * @author Ameya Advankar
@@ -32,7 +31,7 @@ public class AuthService {
 	 * @return True if authenticated successfully, False if not authenticated or
 	 *         exception encountered
 	 */
-	public boolean authenticate(String idToken) {
+	public AuthResult authenticate(String idToken) {
 		try {
 			GoogleIdToken gidToken = verifier.verify(idToken);
 			if (gidToken != null) {
@@ -40,14 +39,14 @@ public class AuthService {
 				String userId = payload.getSubject();
 				String name = (String) payload.get("name");
 				LOGGER.info("Successfully authenticated user ( " + name + "-" + userId + " )");
-				return true;
+				return new AuthResult(userId, name, true);
 			} else {
 				LOGGER.info("Invalid token :" + idToken);
-				return false;
+				return new AuthResult();
 			}
 		} catch (GeneralSecurityException | IOException e) {
 			LOGGER.log(Level.SEVERE, "Exception while authenticating Login Credentials for" + idToken, e);
-			return false;
+			return new AuthResult();
 		}
 	}
 }

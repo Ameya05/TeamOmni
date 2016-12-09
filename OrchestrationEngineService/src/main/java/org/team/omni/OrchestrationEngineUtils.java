@@ -14,6 +14,10 @@ import java.util.Random;
 import javax.sql.DataSource;
 import javax.ws.rs.core.Response;
 
+import org.jooq.DataType;
+import org.jooq.impl.SQLDataType;
+import org.team.omni.orchestration.engine.workflow.WorkFlowExecutionStatus;
+
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -75,6 +79,14 @@ public class OrchestrationEngineUtils {
 		// ContentDisposition((String)
 		// response.getHeaders().getFirst("Content-Disposition"));
 		return saveFile(in, folder + "/File_" + (new Random().nextInt() + ".kml"));
+	}
+
+	public static void createWeatherDetailsDataType() {
+
+	}
+
+	public static DataType<WorkFlowExecutionStatus> createWorkFlowExecutionStatusDataType() {
+		return SQLDataType.VARCHAR.asConvertedDataType(new WorkFlowExecutionStatusEnumConverter(String.class, WorkFlowExecutionStatus.class));
 	}
 
 }
