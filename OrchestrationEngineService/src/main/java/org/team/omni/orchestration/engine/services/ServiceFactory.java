@@ -14,10 +14,11 @@ import org.apache.curator.x.discovery.ServiceInstance;
 import org.apache.curator.x.discovery.ServiceProvider;
 
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
-
+import org.glassfish.jersey.media.sse.SseFeature;
 import org.team.omni.OrchestrationEngineValueStore;
 import org.team.omni.exceptions.OrchestrationEngineException;
 import org.team.omni.exceptions.ServiceCreationException;
+import org.team.omni.orchestration.engine.workflow.WorkFlowState;
 import org.team.omni.weather.InstanceDetails;
 
 public class ServiceFactory {
@@ -29,7 +30,7 @@ public class ServiceFactory {
 	private ServiceDiscovery<InstanceDetails> serviceDiscovery = null;
 
 	private ServiceFactory() {
-		client = ClientBuilder.newBuilder().register(new MultiPartFeature()).build();
+		client = ClientBuilder.newBuilder().register(new MultiPartFeature()).register(new SseFeature()).build();
 	}
 
 	public void setServiceDiscovery(ServiceDiscovery<InstanceDetails> serviceDiscovery) {
@@ -40,7 +41,7 @@ public class ServiceFactory {
 		return SERVICE_FACTORY;
 	}
 
-	public <T> T createService(Class<T> serviceClass) throws ServiceCreationException {
+	public <T> T createService(Class<T> serviceClass, WorkFlowState workFlowState) throws ServiceCreationException {
 		if (serviceDiscovery == null) {
 			throw new OrchestrationEngineException("Please set the service discovery");
 		}
@@ -57,7 +58,7 @@ public class ServiceFactory {
 				throw new ServiceCreationException("Service Could not be found", serviceName);
 			} else {
 				ServiceInstance<InstanceDetails> serviceInstance = requiredServiceInstance.get();
-				return serviceClass.getConstructor(WebTarget.class, OrchestrationEngineValueStore.class, ServiceInstance.class).newInstance(client.target(serviceInstance.buildUriSpec()), orchestrationEngineValueStore, serviceInstance);
+				return serviceClass.getConstructor(WebTarget.class, OrchestrationEngineValueStore.class, ServiceInstance.class, WorkFlowState.class).newInstance(client.target(serviceInstance.buildUriSpec()), orchestrationEngineValueStore, serviceInstance, workFlowState);
 			}
 		} catch (Exception e) {
 			throw new ServiceCreationException("Service: " + serviceClass.getName(), e, serviceName);

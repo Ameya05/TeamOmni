@@ -11,6 +11,7 @@ import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPart;
 import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
 import org.team.omni.OrchestrationEngineValueStore;
+import org.team.omni.orchestration.engine.workflow.WorkFlowState;
 import org.team.omni.weather.InstanceDetails;
 
 /**
@@ -20,8 +21,8 @@ import org.team.omni.weather.InstanceDetails;
  */
 public class ForecastTriggerService extends Service {
 
-	public ForecastTriggerService(WebTarget serviceAddress, OrchestrationEngineValueStore orchestrationEngineValueStore,ServiceInstance<InstanceDetails> serviceInstance) {
-		super(serviceAddress.path("/forecast/trigger"), orchestrationEngineValueStore,serviceInstance);
+	public ForecastTriggerService(WebTarget serviceAddress, OrchestrationEngineValueStore orchestrationEngineValueStore,ServiceInstance<InstanceDetails> serviceInstance,WorkFlowState workFlowState) {
+		super(serviceAddress.path("/forecast/trigger"), orchestrationEngineValueStore,serviceInstance,workFlowState);
 	}
 
 	public ForecastTriggerService(WebTarget servicePath) {

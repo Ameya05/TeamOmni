@@ -8,6 +8,7 @@ import javax.ws.rs.client.WebTarget;
 import org.apache.curator.x.discovery.ServiceInstance;
 import org.team.omni.DataHolder;
 import org.team.omni.OrchestrationEngineValueStore;
+import org.team.omni.orchestration.engine.workflow.WorkFlowState;
 import org.team.omni.weather.InstanceDetails;
 
 /**
@@ -18,8 +19,8 @@ import org.team.omni.weather.InstanceDetails;
  */
 public class DataIngestionService extends Service {
 
-	public DataIngestionService(WebTarget serviceAddress, OrchestrationEngineValueStore orchestrationEngineValueStore, ServiceInstance<InstanceDetails> serviceInstance) {
-		super(serviceAddress.path("/nexrad/generate/url/"), orchestrationEngineValueStore, serviceInstance);
+	public DataIngestionService(WebTarget serviceAddress, OrchestrationEngineValueStore orchestrationEngineValueStore, ServiceInstance<InstanceDetails> serviceInstance,WorkFlowState workFlowState) {
+		super(serviceAddress.path("/nexrad/generate/url/"), orchestrationEngineValueStore, serviceInstance,workFlowState);
 	}
 
 	public DataIngestionService(WebTarget servicePath) {

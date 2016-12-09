@@ -1,10 +1,20 @@
 package org.team.omni.orchestration.engine.workflow;
 
+import static org.jooq.impl.DSL.*;
+
 import java.io.File;
+
 import java.time.LocalDateTime;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record1;
+import org.jooq.impl.SQLDataType;
+
+import org.team.omni.WeatherDetailsConverter;
 import org.team.omni.beans.WeatherDetails;
 import org.team.omni.exceptions.OrchestrationEngineException;
 import org.team.omni.exceptions.ServiceCreationException;
@@ -17,36 +27,51 @@ import org.team.omni.orchestration.engine.services.StormClusteringService;
 import org.team.omni.orchestration.engine.services.StormDetectionService;
 import org.team.omni.orchestration.engine.services.WeatherForecastExecutionService;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+/**
+ * 
+ * @author Eldho Mathulla
+ *
+ */
 public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetails>, Runnable {
 
 	private static final Logger LOGGER = Logger.getLogger("Orchestration");
+
+	private final Field<WeatherDetails> resultField = field("result", SQLDataType.VARCHAR.asConvertedDataType(new WeatherDetailsConverter(new ObjectMapper())));
 	private ServiceFactory serviceFactory;
 	private String stationName = "";
-	private LocalDateTime timeStamp;
+	private LocalDateTime inputTimeStamp;
+	private LocalDateTime executionTimeStamp;
 	private WeatherDetails weatherDetails = null;
 	private WorkFlowState workFlowState;
+	private int id;
 	private Thread workFlowExecutionThread = null;
+	private DSLContext create;
 
-	public SimpleWorkFlow(ServiceFactory serviceFactory, String stationName, LocalDateTime timeStamp, WorkFlowState workFlowState) {
+	public SimpleWorkFlow(int id, ServiceFactory serviceFactory, String stationName, LocalDateTime inputTimeStamp, WorkFlowState workFlowState, DSLContext create, LocalDateTime executionTimeStamp) {
 		this.serviceFactory = serviceFactory;
-		this.stationName = stationName;
-		this.timeStamp = timeStamp;
-		this.workFlowState = workFlowState;
+		this.setStationName(stationName);
+		this.setInputTimeStamp(inputTimeStamp);
+		this.setWorkFlowState(workFlowState);
+		this.setId(id);
+		this.create = create;
+		this.setExecutionTimeStamp(executionTimeStamp);
 	}
 
 	public <T, U extends Service> T executeService(ServiceExecution<T, U> serviceExecution, Class<U> serviceClass) {
 		String serviceName = serviceClass.getSimpleName();
-		workFlowState.setCurrentService(serviceName);
+		getWorkFlowState().processCurrentService(serviceName);
 		int tries = 0;
 		do {
 			tries++;
 			LOGGER.info("Trying " + tries + " .............");
 			try {
-				U serviceInstance = serviceFactory.createService(serviceClass);
+				U serviceInstance = serviceFactory.createService(serviceClass, getWorkFlowState());
 				return serviceExecution.execute(serviceInstance);
 			} catch (Exception e) {
 				if (tries >= 3) {
-					workFlowState.setError(e);
+					getWorkFlowState().processError(e);
 					throw new ServiceExecutionException(e);
 				} else {
 					LOGGER.log(Level.SEVERE, "Unexpected error", e);
@@ -68,7 +93,7 @@ public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetail
 
 	public String handleDataIngestionService() throws ServiceCreationException {
 		return executeService((DataIngestionService dataIngestionService) -> {
-			return dataIngestionService.constructDataFileURL(stationName, timeStamp);
+			return dataIngestionService.constructDataFileURL(getStationName(), getInputTimeStamp());
 		}, DataIngestionService.class);
 	}
 
@@ -97,44 +122,111 @@ public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetail
 	}
 
 	@Override
-	public synchronized WorkFlowState getWorkFlowState() {
-		return workFlowState;
+	public synchronized WeatherDetails fetchResult() {
+		if (getWeatherDetails() != null) {
+			return getWeatherDetails();
+		} else {
+			Record1<WeatherDetails> res = create.select(resultField).from(table("work_flow_details")).where(field("id").equal(getId())).fetchOne();
+			this.processWeatherDetails(res.value1());
+			return getWeatherDetails();
+		}
 	}
 
-	@Override
-	public synchronized WeatherDetails fetchResult() {
-		return weatherDetails;
+	private void processWeatherDetails(WeatherDetails weatherDetails) {
+		this.setWeatherDetails(weatherDetails);
+		int updateCount = create.update(table("work_flow_details")).set(resultField, weatherDetails).where(field("id").equal(getId())).execute();
+		if (updateCount == 0) {
+			throw new OrchestrationEngineException("Work flow result saving failed");
+		}
+	}
+
+	private void log(String log, Level level) {
+		LOGGER.log(level, log);
+		getWorkFlowState().log(log);
+	}
+
+	private void info(String log) {
+		log(log, Level.INFO);
 	}
 
 	@Override
 	public void run() {
 		try {
-			LOGGER.info("==================================\nBeginning workflow for - " + workFlowState.getUserId());
-
+			info("==================================\nBeginning workflow for - " + getWorkFlowState().getUserId());
+			getWorkFlowState().processExecutionStatus(WorkFlowExecutionStatus.EXECUTING);
 			String key = handleDataIngestionService();
-			LOGGER.info("DataIngestionService successfully executed. Key fetched: " + key);
+			info("DataIngestionService successfully executed. Key fetched: " + key);
 
 			File kmlFile = handleStormDetectionService(key);
-			LOGGER.info("StormDetectionService successfully executed.");
+			info("StormDetectionService successfully executed.");
 
 			File clusteringFile = handleStormClusteringService(kmlFile);
-			LOGGER.info("StormClusteringService successfully executed.");
+			info("StormClusteringService successfully executed.");
 
 			boolean forecast = handleForecastTriggerService(clusteringFile);
-			LOGGER.info("ForecastTriggerService returned Storm status: " + forecast);
+			info("ForecastTriggerService returned Storm status: " + forecast);
 			if (forecast) {
-				LOGGER.info("Since storm is present, running Weather Forecast: " + forecast);
-				weatherDetails = hanldeWeatherForecastExecutionService();
-				workFlowState.setExecutionStatus(WorkFlowExecutionStatus.EXECUTION_COMPLETE);
+				info("Since storm is present, running Weather Forecast: " + forecast);
+				processWeatherDetails(hanldeWeatherForecastExecutionService());
+				getWorkFlowState().processExecutionStatus(WorkFlowExecutionStatus.EXECUTION_COMPLETE);
 			} else {
-				LOGGER.info("Since no storm is present, skipping Weather Forecast: " + forecast);
-				workFlowState.setExecutionStatus(WorkFlowExecutionStatus.EXECUTION_NOT_REQUIRED);
+				info("Since no storm is present, skipping Weather Forecast: " + forecast);
+				getWorkFlowState().processExecutionStatus(WorkFlowExecutionStatus.EXECUTION_NOT_REQUIRED);
 			}
 		} catch (ServiceCreationException e) {
-			workFlowState.setExecutionStatus(WorkFlowExecutionStatus.EXECUTION_FAILURE);
+			getWorkFlowState().processError(e);
 			LOGGER.log(Level.SEVERE, "Workflow Execution Failure", e);
 		}
 
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public LocalDateTime getExecutionTimeStamp() {
+		return executionTimeStamp;
+	}
+
+	public void setExecutionTimeStamp(LocalDateTime executionTimeStamp) {
+		this.executionTimeStamp = executionTimeStamp;
+	}
+
+	public String getStationName() {
+		return stationName;
+	}
+
+	public void setStationName(String stationName) {
+		this.stationName = stationName;
+	}
+
+	public LocalDateTime getInputTimeStamp() {
+		return inputTimeStamp;
+	}
+
+	public void setInputTimeStamp(LocalDateTime inputTimeStamp) {
+		this.inputTimeStamp = inputTimeStamp;
+	}
+
+	public WeatherDetails getWeatherDetails() {
+		return weatherDetails;
+	}
+
+	public void setWeatherDetails(WeatherDetails weatherDetails) {
+		this.weatherDetails = weatherDetails;
+	}
+
+	@Override
+	public synchronized WorkFlowState getWorkFlowState() {
+		return workFlowState;
+	}
+
+	public void setWorkFlowState(WorkFlowState workFlowState) {
+		this.workFlowState = workFlowState;
 	}
 
 }
