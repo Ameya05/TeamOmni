@@ -1,14 +1,20 @@
 package org.team.omni.weather.mesos;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.OutboundEvent;
+import org.team.omni.weather.aurora.OmniAuroraClient;
+import org.team.omni.weather.aurora.client.AuroraSchedulerClientFactory;
+import org.team.omni.weather.aurora.client.sdk.ReadOnlyScheduler;
+import org.team.omni.weather.aurora.utils.Constants;
 import org.team.omni.weather.model.WeatherDetails;
 
 public class MesosService implements Runnable {
@@ -16,6 +22,8 @@ public class MesosService implements Runnable {
 	private List<EventOutput> evenOutputs = new ArrayList<>();
 	private Thread mesosServiceThread;
 	private static final Logger logger = Logger.getLogger(MesosService.class);
+	private static Properties properties = new Properties();
+	private static ReadOnlyScheduler.Client omniAuroraClient;
 
 	public MesosService() {
 		mesosServiceThread = new Thread(this);
@@ -65,27 +73,15 @@ public class MesosService implements Runnable {
 			// TODO the mesos execution code here
 
 			logger.info("Entered Microservice F");
-
-			// load test
-
-			int[] a = new int[200000];
-			long sum = 0;
-			for (int i = 0; i < 200000; i++) {
-				a[i] = i;
-				sum += i;
-				sum -= i;
-				sum++;
-				if (i % 100000 == 0) {
-					writeStatus("Sum: " + sum);
-				}
-
-			}
-
-			for (int i = 0; i < 200000; i++)
-				a[i] = 0;
-
-			// load test
-
+			properties.load(MesosService.class.getClassLoader().getResourceAsStream(Constants.AURORA_SCHEDULER_PROP_FILE));
+			String auroraHost = properties.getProperty(Constants.AURORA_SCHEDULER_HOST);
+			String auroraPort = properties.getProperty(Constants.AURORA_SCHEDULER_PORT);
+			omniAuroraClient = AuroraSchedulerClientFactory.createReadOnlySchedulerClient(MessageFormat.format(Constants.AURORA_SCHEDULER_CONNECTION_URL, auroraHost, auroraPort));
+			
+			logger.info("Done with creating Aurora Client");
+			OmniAuroraClient.createJob();
+			logger.info("Done with creating Aurora Job");
+			
 			WeatherDetails forecast = new WeatherDetails();
 			forecast.setWeatherType("Rainy");
 			forecast.setTemperatureUnit("deg. F");
@@ -97,6 +93,10 @@ public class MesosService implements Runnable {
 			writeStatus("Result /incomn=ing");
 			writeResult(forecast);
 			writeStatus("Resf");
+		} catch (IOException e) {
+			logger.error("IOException while getting Aurora Scheduler property file",e);
+		} catch (Exception e) {
+			logger.error("Exception encountered while running MesosService",e);
 		} finally {
 			evenOutputs.forEach((EventOutput evenOutput) -> closeEventOutput(evenOutput));
 		}
