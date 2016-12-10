@@ -87,14 +87,14 @@ public class OmniAuroraClient {
 		}
 	}
 	
-	public void createJob() throws Exception {
+	public void createJob(String requestID) throws Exception {
 		
 		UUID uuid = UUID.randomUUID();
 		logger.info("Inside OmniAuroraClient.createJob()");
 		JobKeyBean jobKey = new JobKeyBean("devel", "team-omni", "omni_wrf");
 		IdentityBean owner = new IdentityBean("team-omni");
 		
-		ProcessBean proc1 = new ProcessBean("process_1", "docker run -i --volumes-from wpsgeog --volumes-from wrfinputsandy -v ~/wrfoutput:/wrfoutput --name ncarwrfsandy bigwxwrf/ncar-wrf /wrf/run-wrf", false);
+		ProcessBean proc1 = new ProcessBean("process_1", "docker run -i --volumes-from wpsgeog --volumes-from wrfinputsandy -v ~/wrfoutput:/wrfoutput --name omniSandy"+requestID+" bigwxwrf/ncar-wrf /wrf/run-wrf", false);
 		Set<ProcessBean> processes = new HashSet<>();
 		processes.add(proc1);
 		

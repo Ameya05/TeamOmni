@@ -2,6 +2,7 @@ package org.team.omni.weather.service;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -58,12 +59,13 @@ public class StormForecastService {
 	}
 
 	@GET
-	@Path("/execute")
+	@Path("/execute/{requestID}")
 	@Produces(SseFeature.SERVER_SENT_EVENTS)
-	public EventOutput runForecast() {
+	public EventOutput runForecast(@PathParam("requestID") String requestID) {
 		EventOutput eventOutput = new EventOutput();
 		MesosService mesosService = new MesosService();
 		mesosService.addEventOutput(eventOutput);
+		mesosService.setRequestID(requestID);
 		mesosService.execute();
 		return eventOutput;
 

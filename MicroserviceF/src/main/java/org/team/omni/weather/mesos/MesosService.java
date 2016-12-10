@@ -25,6 +25,16 @@ public class MesosService implements Runnable {
 	private static Properties properties = new Properties();
 	private static ReadOnlyScheduler.Client omniAuroraClient;
 
+	private String requestID;
+	
+	public String getRequestID() {
+		return requestID;
+	}
+
+	public void setRequestID(String requestID) {
+		this.requestID = requestID;
+	}
+
 	public MesosService() {
 		mesosServiceThread = new Thread(this);
 	}
@@ -81,7 +91,7 @@ public class MesosService implements Runnable {
 			OmniAuroraClient omniAuroraClient = new OmniAuroraClient(this);
 			
 			logger.info("Done with creating Aurora Client");
-			omniAuroraClient.createJob();
+			omniAuroraClient.createJob(requestID);
 			logger.info("Done with creating Aurora Job");
 			
 			WeatherDetails forecast = new WeatherDetails();
