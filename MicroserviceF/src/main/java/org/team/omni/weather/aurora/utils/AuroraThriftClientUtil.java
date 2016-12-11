@@ -62,14 +62,27 @@ import org.apache.commons.io.IOUtils;
 					exeConfig.getJSONObject("task").getJSONObject("resources")
 					.put("ram", jobConfig.getTaskConfig().getResources().getRamMb() * 1024 * 1024);
 					
+					/*
+					 * 
+					 * 
+					 */
+					for (String processName:jobConfig.getTaskConfig().getOrder())
+					{
+						exeConfig.getJSONObject("task")			
+							.getJSONArray("constraints")
+							.getJSONObject(0)
+							.getJSONArray("order").put(processName);
+					}
+					
 					// iterate over all processes
 					for(ProcessBean process : jobConfig.getTaskConfig().getProcesses()) {
 						// add process to constraints
-						exeConfig.getJSONObject("task")
+						/*
+						 	exeConfig.getJSONObject("task")
 							.getJSONArray("constraints")
 							.getJSONObject(0)
 							.getJSONArray("order").put(process.getName());
-						
+						*/
 						// define the process json
 						JSONObject processJson = new JSONObject();
 						processJson.put("final", process.isFinal())

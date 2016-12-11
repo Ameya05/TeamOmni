@@ -1,5 +1,6 @@
 package org.team.omni.weather.aurora.bean;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,6 +16,11 @@ private String taskName;
 	
 	/** The processes. */
 	private Set<ProcessBean> processes;
+	
+	/**
+	 *  The order of processes
+	 */
+	private ArrayList<String> order;
 
 	/**
 	 * Instantiates a new task config bean.
@@ -108,6 +114,14 @@ private String taskName;
 	 */
 	public void setProcesses(Set<ProcessBean> processes) {
 		this.processes = processes;
+	}
+
+	public ArrayList<String> getOrder() {
+		return order;
+	}
+
+	public void setOrder(ArrayList<String> order) {
+		this.order = order;
 	}
 	
 }

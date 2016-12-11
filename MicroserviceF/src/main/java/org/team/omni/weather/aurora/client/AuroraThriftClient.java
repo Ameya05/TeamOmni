@@ -53,10 +53,10 @@ public class AuroraThriftClient {
 	private AuroraThriftClient() {}
 	
 	/**
-	 * Gets the omni thrift client.
+	 * Gets the Aurora thrift client.
 	 *
 	 * @param auroraSchedulerPropFile the aurora scheduler prop file
-	 * @return the omni thrift client
+	 * @return the Aurora thrift client
 	 * @throws Exception
 	 */
 	public static AuroraThriftClient getAuroraThriftClient(String auroraSchedulerPropFile) throws Exception {
@@ -109,7 +109,7 @@ public class AuroraThriftClient {
 	 * @return the job details
 	 * @throws Exception the exception
 	 */
-	public ResponseBean getJobDetails(JobKeyBean jobKeyBean) throws Exception {
+	public JobDetailsResponseBean getJobDetails(JobKeyBean jobKeyBean) throws Exception {
 		JobDetailsResponseBean response = null;
 		try {
 			if(jobKeyBean != null) {
@@ -129,4 +129,75 @@ public class AuroraThriftClient {
 		}
 		return response;
 	}
+	
+	/**
+	 * Gets the job list.
+	 *
+	 * @param ownerRole the owner role
+	 * @return the job list
+	 * @throws Exception the exception
+	 */
+	public GetJobsResponseBean getJobList(String ownerRole) throws Exception {
+		GetJobsResponseBean response = null;
+		try {
+				Response jobListResponse = this.readOnlySchedulerClient.getJobs(ownerRole);
+				response = (GetJobsResponseBean) AuroraThriftClientUtil.getResponseBean(jobListResponse, ResponseResultType.GET_JOBS);
+		} catch(Exception ex) {
+			logger.error(ex.getMessage(), ex);
+			throw ex;
+		}
+		return response;
+	}
+	
+	
+	/**
+	 * Kill tasks.
+	 *
+	 * @param jobKeyBean the job key bean
+	 * @param instances the instances
+	 * @return the response bean
+	 * @throws Exception the exception
+	 */
+	public ResponseBean killTasks(JobKeyBean jobKeyBean, Set<Integer> instances) throws Exception {
+		ResponseBean response = null;
+		try {
+			if(jobKeyBean != null) {
+				JobKey jobKey = AuroraThriftClientUtil.getAuroraJobKey(jobKeyBean);
+				Response killTaskResponse = this.auroraSchedulerManagerClient.killTasks(jobKey, instances);
+				response = AuroraThriftClientUtil.getResponseBean(killTaskResponse, ResponseResultType.KILL_TASKS);
+			}
+		} catch(Exception ex) {
+			logger.error(ex.getMessage(), ex);
+			throw ex;
+		}
+		return response;
+	}
+	
+	/**
+	 * Gets the pending reason for job.
+	 *
+	 * @param jobKeyBean the job key bean
+	 * @return the pending reason for job
+	 * @throws Exception the exception
+	 */
+	public PendingJobReasonBean getPendingReasonForJob(JobKeyBean jobKeyBean) throws Exception {
+		PendingJobReasonBean response = null;
+		try {
+				JobKey jobKey = AuroraThriftClientUtil.getAuroraJobKey(jobKeyBean);
+				Set<JobKey> jobKeySet = new HashSet<>();
+				jobKeySet.add(jobKey);
+				
+				TaskQuery query = new TaskQuery();
+				query.setJobKeys(jobKeySet);
+				
+				Response pendingReasonResponse = this.readOnlySchedulerClient.getPendingReason(query);
+				response = (PendingJobReasonBean) AuroraThriftClientUtil.getResponseBean(pendingReasonResponse, ResponseResultType.GET_PENDING_JOB_REASON);
+		} catch(Exception ex) {
+			logger.error(ex.getMessage(), ex);
+			throw ex;
+		}
+		return response;
+	}
+	
+
 }

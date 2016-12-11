@@ -1,5 +1,6 @@
 package org.team.omni.weather.aurora;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -7,6 +8,7 @@ import java.util.UUID;
 import org.team.omni.weather.aurora.client.AuroraThriftClient;
 import org.team.omni.weather.aurora.bean.IdentityBean;
 import org.team.omni.weather.aurora.bean.JobConfigBean;
+import org.team.omni.weather.aurora.bean.JobDetailsResponseBean;
 import org.team.omni.weather.aurora.bean.JobKeyBean;
 import org.team.omni.weather.aurora.bean.ProcessBean;
 import org.team.omni.weather.aurora.bean.ResourceBean;
@@ -19,9 +21,12 @@ import org.team.omni.weather.aurora.client.sdk.JobConfiguration;
 import org.team.omni.weather.aurora.client.sdk.JobKey;
 import org.team.omni.weather.aurora.client.sdk.ReadOnlyScheduler;
 import org.team.omni.weather.aurora.client.sdk.Response;
+import org.team.omni.weather.aurora.client.sdk.ScheduleStatus;
+import org.team.omni.weather.aurora.client.sdk.ScheduledTask;
 import org.team.omni.weather.aurora.client.sdk.TaskConfig;
 import org.team.omni.weather.aurora.utils.AuroraThriftClientUtil;
 import org.team.omni.weather.aurora.utils.Constants;
+import org.team.omni.weather.aurora.utils.ResponseCodeEnum;
 import org.team.omni.weather.mesos.MesosService;
 import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
@@ -87,20 +92,34 @@ public class OmniAuroraClient {
 		}
 	}
 	
-	public void createJob(String requestID) throws Exception {
-		
+	public void createJob(String requestID) throws Exception 
+	{
+		JobDetailsResponseBean jobStatus;
 		UUID uuid = UUID.randomUUID();
 		logger.info("Inside OmniAuroraClient.createJob()");
 		JobKeyBean jobKey = new JobKeyBean("devel", "team-omni", "omni_wrf");
 		IdentityBean owner = new IdentityBean("team-omni");
+		String dockerContainerName = "omni-postproc-"+requestID ;
 		
-		ProcessBean proc1 = new ProcessBean("process_1", "docker run -i --volumes-from wpsgeog --volumes-from wrfinputsandy -v ~/wrfoutput:/wrfoutput --name omniSandy"+requestID+" bigwxwrf/ncar-wrf /wrf/run-wrf", false);
+		ProcessBean proc1 = new ProcessBean("process_1", "docker run -i --volumes-from wpsgeog --volumes-from wrfinputsandy -v ~/wrfoutput:/wrfoutput --name omni-ncarwrfsandy-"+requestID+" bigwxwrf/ncar-wrf /wrf/run-wrf", false);
+		ProcessBean proc2 = new ProcessBean("process_2","docker run -i --rm=true -v ~/wrfoutput:/wrfoutput --name "+dockerContainerName+" bigwxwrf/ncar-ncl",false);
 		Set<ProcessBean> processes = new HashSet<>();
 		processes.add(proc1);
+		processes.add(proc2);
+		
+		
+		
 		
 		ResourceBean resources = new ResourceBean(0.2, 200, 200);
 		
 		TaskConfigBean taskConfig = new TaskConfigBean("run_forecast_task", processes, resources);
+		
+		ArrayList<String> order = new ArrayList<String>();
+		order.add("process_1");
+		order.add("process_2");
+			
+		taskConfig.setOrder(order);
+		
 		JobConfigBean jobConfig = new JobConfigBean(jobKey, owner, taskConfig, "example");
 		
 		String executorConfigJson = AuroraThriftClientUtil.getExecutorConfigJson(jobConfig);
@@ -108,7 +127,38 @@ public class OmniAuroraClient {
 		
 		AuroraThriftClient client = AuroraThriftClient.getAuroraThriftClient(Constants.AURORA_SCHEDULER_PROP_FILE);
 		ResponseBean response = client.createJob(jobConfig);
+		
 		logger.info(response);
 		logger.info("Done with createJob()");
+		ScheduledTask currentTask = new ScheduledTask();
+		
+		do
+		{
+			jobStatus = client.getJobDetails(jobKey);
+			for(ScheduledTask task : jobStatus.getTasks())
+			{
+				if(task.getAssignedTask().getTask().getExecutorConfig().getData().indexOf(dockerContainerName+" ") > 0)
+				{
+					currentTask = task;
+					break;
+				}
+			}
+			System.out.println("Status of task: "+currentTask.getStatus().toString()+ " \nSleeping for 10 seconds..");
+			logger.info("Status of task: "+currentTask.getStatus().toString()+ " \nSleeping for 10 seconds..");
+			Thread.sleep(10000);
+		}
+		while(	!( currentTask.getStatus().name().equals(ScheduleStatus.FINISHED.name()) ||
+					currentTask.getStatus().name().equals(ScheduleStatus.FAILED.name()) ||
+					currentTask.getStatus().name().equals(ScheduleStatus.KILLED.name()) ));
+		System.out.println("Task finished !");
+		logger.info("Task finished !");
 	}
+	
+	public void killTasks(String jobName) throws Exception {
+		JobKeyBean jobKey = new JobKeyBean("devel", "team-omni", jobName);
+		AuroraThriftClient client = AuroraThriftClient.getAuroraThriftClient(Constants.AURORA_SCHEDULER_PROP_FILE);
+		ResponseBean response = client.killTasks(jobKey, new HashSet<>());
+		logger.info(response);
+	}
+	
 }
