@@ -16,9 +16,15 @@ public class ExceptionMapper implements javax.ws.rs.ext.ExceptionMapper<Exceptio
 
 	@Override
 	public Response toResponse(Exception exception) {
-		String errorID = "OE" + getERROR_ID();
-		LOGGER.log(Level.SEVERE, "Error ID: " + errorID + "Exception Thrown: " + exception.getMessage(), exception);
-		return Response.serverError().entity("Error ID: " + errorID).build();
+		try {
+			String errorID = "OE" + getERROR_ID();
+			LOGGER.log(Level.SEVERE, "Error ID: " + errorID + "Exception Thrown: " + exception.getMessage(), exception);
+			ErrorMessage errorMessage = new ErrorMessage(errorID, exception.getMessage());
+			return Response.serverError().entity(errorMessage).build();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "Error Caught while handling another error", exception);
+			return Response.serverError().build();
+		}
 	}
 
 	public static long getERROR_ID() {

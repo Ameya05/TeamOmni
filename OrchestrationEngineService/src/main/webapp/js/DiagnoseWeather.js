@@ -109,8 +109,16 @@ angular
 																+ "\nWind Speed: "
 																+ resp_data.windSpeedVal)
 													}
-												}).error(function(response) {
-											alert(response.executionStatus);
-										})
+												})
+										.error(
+												function(response) {
+													if (response.data &&  response.data.executionStatus) {
+														alert(response.data.executionStatus)
+													} else if (response.message) {
+														alert(response.message);
+													} else {
+														alert("Unknown Error Detected")
+													}
+												})
 							}
 						} ]);

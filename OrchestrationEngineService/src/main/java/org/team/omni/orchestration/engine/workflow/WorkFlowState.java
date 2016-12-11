@@ -2,6 +2,7 @@ package org.team.omni.orchestration.engine.workflow;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.jooq.impl.DSL.*;
@@ -10,6 +11,7 @@ import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Table;
 import org.jooq.UpdateSetMoreStep;
+import org.jooq.impl.SQLDataType;
 import org.team.omni.OrchestrationEngineUtils;
 import org.team.omni.exceptions.OrchestrationEngineException;
 
@@ -90,7 +92,7 @@ public class WorkFlowState {
 
 	public synchronized void log(String log) {
 		if (log != null) {
-			int updateCount = create.insertInto(table("work_flow_history"), field("execution_id"), field("history")).values(getWorkFlowId(), log).execute();
+			int updateCount = create.insertInto(table("work_flow_history"), field("execution_id"), field("history"), field("time_stamp", SQLDataType.LOCALDATETIME)).values(getWorkFlowId(), log, LocalDateTime.now()).execute();
 			if (updateCount == 0) {
 				throw new OrchestrationEngineException("Work Flow loging failed");
 			}

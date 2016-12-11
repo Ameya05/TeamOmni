@@ -2,10 +2,16 @@ package org.team.omni.beans;
 
 public class WeatherDetails {
 	private String weatherType;
+
 	private String temperatureUnit;
+
 	private double temperatureValue;
+
 	private String windSpeedUnit;
+
 	private double windSpeedVal;
+
+	private String imageURL;
 
 	public WeatherDetails() {
 	}
@@ -48,6 +54,14 @@ public class WeatherDetails {
 
 	public void setWindSpeedVal(double windSpeedVal) {
 		this.windSpeedVal = windSpeedVal;
+	}
+
+	public String getImageURL() {
+		return imageURL;
+	}
+
+	public void setImageURL(String imageURL) {
+		this.imageURL = imageURL;
 	}
 
 	@Override

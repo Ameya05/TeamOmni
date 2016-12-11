@@ -1,5 +1,7 @@
 package org.team.omni.orchestration.engine.services;
 
+import java.util.logging.Logger;
+
 import javax.ws.rs.client.WebTarget;
 
 import org.apache.curator.x.discovery.ServiceInstance;
@@ -15,6 +17,9 @@ import org.team.omni.weather.InstanceDetails;
  *
  */
 public abstract class Service {
+	
+	protected static final Logger LOGGER = Logger.getLogger("Orchestration");
+
 
 	protected WebTarget serviceAddress;
 	protected OrchestrationEngineValueStore orchestrationEngineValueStore;
