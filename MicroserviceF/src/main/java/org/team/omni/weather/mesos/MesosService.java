@@ -91,7 +91,7 @@ public class MesosService implements Runnable {
 			OmniAuroraClient omniAuroraClient = new OmniAuroraClient(this);
 			
 			logger.info("Done with creating Aurora Client");
-			omniAuroraClient.createJob(requestID);
+			String imageURL = omniAuroraClient.createJob(requestID);
 			logger.info("Done with creating Aurora Job");
 			
 			WeatherDetails forecast = new WeatherDetails();
@@ -100,6 +100,7 @@ public class MesosService implements Runnable {
 			forecast.setTemperatureValue(89.9);
 			forecast.setWindSpeedUnit("mph");
 			forecast.setWindSpeedVal(10);
+			forecast.setImageURL(imageURL);
 
 			logger.info("Returning Response to Orchestration Engine");
 			writeStatus("Result incomning");

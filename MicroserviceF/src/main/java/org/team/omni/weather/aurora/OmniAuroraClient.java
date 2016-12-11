@@ -34,6 +34,13 @@ import org.apache.thrift.TException;
 public class OmniAuroraClient {
 
 	final static Logger logger = Logger.getLogger(OmniAuroraClient.class);
+	
+	private final static String SLAVE_ONE_IP = "52.53.179.0";
+	private final static String SLAVE_TWO_IP = "52.53.179.0";
+	private final static String SLAVE_ONE_HOST = "sga-mesos-slave-1";
+	private final static String SLAVE_TWO_HOST = "sga-mesos-slave-2";
+	private final static String PORT = "1338";
+	
 	private MesosService mesosService;
 	
 	public OmniAuroraClient(MesosService mesosService)
@@ -53,7 +60,7 @@ public class OmniAuroraClient {
 	{
 		try 
 		{
-			Response response = client.getJobs("centos");
+			Response response = client.getJobs("team-omni");
 			logger.info("Response status: " + response.getResponseCode().name());
 			if(response.getResult().isSetGetJobsResult()) 
 			{
@@ -92,12 +99,17 @@ public class OmniAuroraClient {
 		}
 	}
 	
-	public void createJob(String requestID) throws Exception 
+	/**
+	 * Returns the imageURL generated from the job
+	 * @param requestID
+	 * @return imageURL
+	 * @throws Exception
+	 */
+	public String createJob(String requestID) throws Exception 
 	{
 		JobDetailsResponseBean jobStatus;
-		UUID uuid = UUID.randomUUID();
 		logger.info("Inside OmniAuroraClient.createJob()");
-		JobKeyBean jobKey = new JobKeyBean("devel", "team-omni", "omni_wrf");
+		JobKeyBean jobKey = new JobKeyBean("devel", "team-omni", "omni_wrf_"+requestID);
 		IdentityBean owner = new IdentityBean("team-omni");
 		String dockerContainerName = "omni-postproc-"+requestID ;
 		
@@ -143,15 +155,40 @@ public class OmniAuroraClient {
 					break;
 				}
 			}
-			System.out.println("Status of task: "+currentTask.getStatus().toString()+ " \nSleeping for 10 seconds..");
 			logger.info("Status of task: "+currentTask.getStatus().toString()+ " \nSleeping for 10 seconds..");
 			Thread.sleep(10000);
 		}
 		while(	!( currentTask.getStatus().name().equals(ScheduleStatus.FINISHED.name()) ||
 					currentTask.getStatus().name().equals(ScheduleStatus.FAILED.name()) ||
 					currentTask.getStatus().name().equals(ScheduleStatus.KILLED.name()) ));
-		System.out.println("Task finished !");
+
 		logger.info("Task finished !");
+		
+		String imageURL = getOutputLink(currentTask);
+		logger.info("imageURL: "+imageURL);
+		
+		return imageURL;
+	}
+	
+	/**
+	 * Given a task, generate the output image file url
+	 * @param task
+	 * @return imageURL
+	 */
+	private String getOutputLink(ScheduledTask task)
+	{
+		String imageURL = "http://";
+		
+		if (task.getAssignedTask().getSlaveHost().equals(SLAVE_ONE_HOST))
+			imageURL += SLAVE_ONE_IP;
+		else if (task.getAssignedTask().getSlaveHost().equals(SLAVE_TWO_HOST))
+			imageURL += SLAVE_TWO_IP;
+		
+		imageURL += ":"+PORT+"/download/";
+		imageURL += task.getAssignedTask().getTaskId();
+		imageURL += "/wrfoutput/Precip_total.gif";
+		
+		return imageURL;
 	}
 	
 	public void killTasks(String jobName) throws Exception {

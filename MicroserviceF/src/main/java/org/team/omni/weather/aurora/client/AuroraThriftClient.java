@@ -172,32 +172,4 @@ public class AuroraThriftClient {
 		}
 		return response;
 	}
-	
-	/**
-	 * Gets the pending reason for job.
-	 *
-	 * @param jobKeyBean the job key bean
-	 * @return the pending reason for job
-	 * @throws Exception the exception
-	 */
-	public PendingJobReasonBean getPendingReasonForJob(JobKeyBean jobKeyBean) throws Exception {
-		PendingJobReasonBean response = null;
-		try {
-				JobKey jobKey = AuroraThriftClientUtil.getAuroraJobKey(jobKeyBean);
-				Set<JobKey> jobKeySet = new HashSet<>();
-				jobKeySet.add(jobKey);
-				
-				TaskQuery query = new TaskQuery();
-				query.setJobKeys(jobKeySet);
-				
-				Response pendingReasonResponse = this.readOnlySchedulerClient.getPendingReason(query);
-				response = (PendingJobReasonBean) AuroraThriftClientUtil.getResponseBean(pendingReasonResponse, ResponseResultType.GET_PENDING_JOB_REASON);
-		} catch(Exception ex) {
-			logger.error(ex.getMessage(), ex);
-			throw ex;
-		}
-		return response;
-	}
-	
-
 }
