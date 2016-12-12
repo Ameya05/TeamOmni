@@ -7,9 +7,6 @@ angular.module('omni', ["ngRoute"])
 		.when("/login", {
 			templateUrl : "blank.html"
 		})
-		.when("/JobDetails", {
-			templateUrl : "JobDetails.html"
-		})
 		.otherwise({
 			redirectTo: '/login'
 		});
@@ -52,13 +49,4 @@ function showLoginDiv(loggedIn){
 		document.getElementById('loginDiv').style.display = '';
 		document.getElementById('logoutDiv').style.display = 'none';
 	}
-}
-
-
-function showJobDetails(){
-	
-	//AddStuffHere
-
-	window.location = '#JobDetails';
-
 }
