@@ -2,31 +2,46 @@ package org.team.omni.weather.mesos;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.Properties;
-
-import javax.ws.rs.core.MediaType;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
-import org.glassfish.jersey.media.sse.EventOutput;
-import org.glassfish.jersey.media.sse.OutboundEvent;
 import org.team.omni.weather.aurora.OmniAuroraClient;
 import org.team.omni.weather.aurora.client.AuroraSchedulerClientFactory;
 import org.team.omni.weather.aurora.client.sdk.ReadOnlyScheduler;
 import org.team.omni.weather.aurora.utils.Constants;
 import org.team.omni.weather.model.WeatherDetails;
 
+/**
+ * 
+ * @author Eldho Mathulla, Ameya Advankar
+ *
+ */
 public class MesosService implements Runnable {
-	
-	private List<EventOutput> evenOutputs = new ArrayList<>();
+
+	private static Map<String, MesosService> mesosServiceMap = new ConcurrentHashMap<>();
+
 	private Thread mesosServiceThread;
 	private static final Logger logger = Logger.getLogger(MesosService.class);
-	private static Properties properties = new Properties();
-	private static ReadOnlyScheduler.Client omniAuroraClient;
+	private Properties properties = new Properties();
+	private ReadOnlyScheduler.Client omniAuroraClient;
+	private Queue<MesosStatus> mesosStatus = new LinkedList<>();
 
 	private String requestID;
-	
+	private WeatherDetails forecastResult;
+
+	public MesosService(String requestID) {
+		this();
+		this.requestID = requestID;
+	}
+
+	public MesosService() {
+		mesosServiceThread = new Thread(this);
+	}
+
 	public String getRequestID() {
 		return requestID;
 	}
@@ -35,103 +50,81 @@ public class MesosService implements Runnable {
 		this.requestID = requestID;
 	}
 
-	public MesosService() {
-		mesosServiceThread = new Thread(this);
-	}
-
-	public void addEventOutput(EventOutput eventOutput) {
-		this.evenOutputs.add(eventOutput);
-	}
-
-	/**
-	 * Use this function to send constant statuses to the client
-	 * 
-	 * @param status
-	 */
-	private void outputEvent(Object event, String comment) {
-		OutboundEvent.Builder outBoundEventBuilder = new OutboundEvent.Builder();
-		outBoundEventBuilder.name("storm-forecast");
-		outBoundEventBuilder.mediaType(MediaType.APPLICATION_JSON_TYPE);
-		outBoundEventBuilder.comment(comment);
-		OutboundEvent outboundEvent = outBoundEventBuilder.data(event).build();
-		evenOutputs.parallelStream().forEach((EventOutput evenOutput) -> writeOutBoundEvent(evenOutput, outboundEvent));
-	}
-
-	/**
-	 * Writing the status
-	 * @param status
-	 */
-	public void writeStatus(String status) {
-		outputEvent(status, "status");
-	}
-
-	/**
-	 * Writing the result 
-	 * @param weatherForecast
-	 */
-	public void writeResult(WeatherDetails weatherForecast) {
-		outputEvent(weatherForecast, "result");
-	}
-
 	public void execute() {
-		mesosServiceThread.start();
+		if (!mesosServiceThread.isAlive()) {
+			mesosServiceThread.start();
+		} else {
+			throw new StormForecastException("Execution failure");
+		}
 	}
 
 	@Override
 	public void run() {
 		try {
-			// TODO the mesos execution code here
-
 			logger.info("Entered Microservice F");
+			info("Execution Started");
 			properties.load(MesosService.class.getClassLoader().getResourceAsStream(Constants.AURORA_SCHEDULER_PROP_FILE));
 			String auroraHost = properties.getProperty(Constants.AURORA_SCHEDULER_HOST);
 			String auroraPort = properties.getProperty(Constants.AURORA_SCHEDULER_PORT);
 			omniAuroraClient = AuroraSchedulerClientFactory.createReadOnlySchedulerClient(MessageFormat.format(Constants.AURORA_SCHEDULER_CONNECTION_URL, auroraHost, auroraPort));
-			
 			OmniAuroraClient omniAuroraClient = new OmniAuroraClient(this);
-			
-/*			logger.info("Done with creating Aurora Client");
+			logger.info("Done with creating Aurora Client");
 			String imageURL = omniAuroraClient.createJob(requestID);
-			logger.info("Done with creating Aurora Job");*/
-			
-			WeatherDetails forecast = new WeatherDetails();
-			forecast.setWeatherType("Rainy");
-			forecast.setTemperatureUnit("deg. F");
-			forecast.setTemperatureValue(89.9);
-			forecast.setWindSpeedUnit("mph");
-			forecast.setWindSpeedVal(10);
-			//forecast.setImageURL(imageURL);
-
+			logger.info("Done with creating Aurora Job");
+			setForecastResult(new WeatherDetails());
+			getForecastResult().setWeatherType("Rainy");
+			getForecastResult().setTemperatureUnit("deg. F");
+			getForecastResult().setTemperatureValue(89.9);
+			getForecastResult().setWindSpeedUnit("mph");
+			getForecastResult().setWindSpeedVal(10);
+			forecastResult.setImageURL(imageURL);
+			complete("Execution Completed", forecastResult);
 			logger.info("Returning Response to Orchestration Engine");
-			writeStatus("Result incomning");
-			writeResult(forecast);
 		} catch (IOException e) {
-			logger.error("IOException while getting Aurora Scheduler property file",e);
-			writeStatus("Exception while reading "+Constants.AURORA_SCHEDULER_PROP_FILE+" file");
-		}
-		catch (Exception e) {
-			logger.error("Exception encountered while running MesosService",e);
-			writeStatus("Exception encountered while running MesosService");
-			writeResult(null);
+			error("IOException while getting Aurora Scheduler property file", e);
+		} catch (Exception e) {
+			error("Exception encountered while running MesosService", e);
 		} finally {
-			evenOutputs.forEach((EventOutput evenOutput) -> closeEventOutput(evenOutput));
 		}
 
 	}
 
-	private void writeOutBoundEvent(EventOutput eventOutput, OutboundEvent outboundEvent) {
-		try {
-			eventOutput.write(outboundEvent);
-		} catch (IOException e) {
-			throw new StormForecastException(e);
+	public void info(String info) {
+		mesosStatus.add(new MesosStatus(MesosStatusType.EXECUTING, info));
+	}
+
+	public void error(String message, Exception e) {
+		mesosStatus.add(new MesosStatus(MesosStatusType.EXECUTION_FAILURE, message, e));
+		logger.error(message);
+	}
+
+	public void complete(String message, WeatherDetails weatherDetails) {
+		mesosStatus.add(new MesosStatus(MesosStatusType.EXECUTION_SUCCESS, message, weatherDetails));
+	}
+
+	public MesosStatus consume() {
+		if (!mesosStatus.isEmpty()) {
+			return mesosStatus.remove();
+		} else {
+			return new MesosStatus();
 		}
 	}
 
-	private void closeEventOutput(EventOutput eventOutput) {
-		try {
-			eventOutput.close();
-		} catch (IOException e) {
-			throw new StormForecastException(e);
+	public WeatherDetails getForecastResult() {
+		return forecastResult;
+	}
+
+	public void setForecastResult(WeatherDetails forecastResult) {
+		this.forecastResult = forecastResult;
+	}
+
+	public static MesosService createMesosService(String requestId) {
+		if (mesosServiceMap.containsKey(requestId)) {
+			return mesosServiceMap.get(requestId);
+		} else {
+			MesosService mesosService = new MesosService(requestId);
+			mesosServiceMap.put(requestId, mesosService);
+			return mesosService;
 		}
 	}
 
