@@ -70,7 +70,7 @@ public class WorkFlowMap {
 	}
 
 	private int createId(String userId, String stationName, LocalDateTime timeStamp, WorkFlowExecutionStatus executionStatus, LocalDateTime executionTimeStamp) {
-		Optional<Record> record = create.insertInto(workflowDetailsTable, userIdField, statusField, currentServiceField, resultField, previousServiceField, stationNameField, inputTimeStampField, errorMessageField, detailedErrorMessageField, executionTimeStampField).values(userId, executionStatus, "", null, "", stationName, timeStamp, null, null, executionTimeStamp).returning(field("ID")).fetchOptional();
+		Optional<Record> record = create.insertInto(workflowDetailsTable, userIdField, statusField, currentServiceField, resultField, previousServiceField, stationNameField, inputTimeStampField, errorMessageField, detailedErrorMessageField, executionTimeStampField).values(userId, executionStatus, "", null, "", stationName, timeStamp, null, null, executionTimeStamp).returning(workFlowIdField).fetchOptional();
 		if (record.isPresent()) {
 			return record.get().getValue(workFlowIdField);
 		} else {
