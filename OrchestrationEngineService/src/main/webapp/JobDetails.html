@@ -5,9 +5,32 @@
 	<link rel="stylesheet" type="text/css" href="css/DiagnoseWeather.css">
 </head>
 <body>
-	<div id="container" height="80%" width="20%" ng-controller="jobHistory">
+	<style>
+		table, th , td {
+		  border: 1px solid grey;
+		  border-collapse: collapse;
+		  padding: 5px;
+		}
+		table tr:nth-child(odd) {
+		  background-color: #f1f1f1;
+		}
+		table tr:nth-child(even) {
+		  background-color: #ffffff;
+		}
+	</style>
+	<div id="container" height="100%" width="100%" ng-controller="jobHistory">
 		<h2> Job details </h2>
-		
+		<table>
+		  <tr ng-repeat="w in workflows">
+		  	<td>{{ w.id }}</td>
+		    <td>{{ w.stationName }}</td>
+		    <td>{{ w.inputTimeStamp }}</td>
+		    <td>{{ w.executionTimeStamp }}</td>
+		    <td>{{ w.weatherDetails }}</td>
+		    <td>{{ w.workFlowState.currentService }}</td>
+		    <td>{{ w.workFlowState.executionStatus }}</td>
+		  </tr>
+		</table>
 	</div>
 </body>
 </html>
