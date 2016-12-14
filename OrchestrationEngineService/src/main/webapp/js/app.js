@@ -7,7 +7,7 @@ angular.module('omni', ["ngRoute"])
 		.when("/login", {
 			templateUrl : "blank.html"
 		})
-		.when("/JobDetails", {
+		.when("/history", {
 			templateUrl : "JobDetails.html"
 		})
 		.otherwise({
