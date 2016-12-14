@@ -55,10 +55,7 @@ function showLoginDiv(loggedIn){
 }
 
 
-function showJobDetails(){
-	
-	//AddStuffHere
-
-	window.location = '#JobDetails';
+function redirectToDetails(){
+	window.location = '#history';
 
 }
