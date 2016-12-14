@@ -66,7 +66,7 @@ public class WeatherDetails {
 
 	@Override
 	public String toString() {
-		return "Weather Type:" + weatherType + "\n" + "Temperature Unit: " + temperatureUnit + "\nTemperature: " + temperatureValue + "\nWind Speed Unit: " + windSpeedUnit + "\nWind Speed :" + windSpeedVal;
+		return "Weather Type:" + weatherType + "\n" + "Temperature Unit: " + temperatureUnit + "\nTemperature: " + temperatureValue + "\nWind Speed Unit: " + windSpeedUnit + "\nWind Speed :" + windSpeedVal + "\nURL:" + imageURL;
 	}
 
 }

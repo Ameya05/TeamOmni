@@ -20,6 +20,7 @@ import org.team.omni.exceptions.OrchestrationEngineException;
 import org.team.omni.exceptions.ServiceCreationException;
 import org.team.omni.orchestration.engine.workflow.WorkFlowState;
 import org.team.omni.weather.InstanceDetails;
+import org.team.omni.weather.api.filter.ServiceClientResponseFilter;
 
 public class ServiceFactory {
 	private static final ServiceFactory SERVICE_FACTORY = new ServiceFactory();
@@ -30,7 +31,7 @@ public class ServiceFactory {
 	private ServiceDiscovery<InstanceDetails> serviceDiscovery = null;
 
 	private ServiceFactory() {
-		client = ClientBuilder.newBuilder().register(new MultiPartFeature()).register(new SseFeature()).build();
+		client = ClientBuilder.newBuilder().register(new MultiPartFeature()).register(new SseFeature()).register(new ServiceClientResponseFilter()).build();
 	}
 
 	public void setServiceDiscovery(ServiceDiscovery<InstanceDetails> serviceDiscovery) {

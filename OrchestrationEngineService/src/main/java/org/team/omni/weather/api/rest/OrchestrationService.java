@@ -57,14 +57,17 @@ public class OrchestrationService {
 	@Path("/fetch/workflows/{user_id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public DataHolder fetchWorkFlowIds(@PathParam("user_id") String userID) {
-		return new DataHolder(workFlowMap.fetchWorkFlowIds(userID));
+		return new DataHolder(workFlowMap.fetchWorkFlows(userID));
 	}
 
 	private DataHolder createDataHolder(OrchestrationEngineWorkFlow<WeatherDetails> workFlow) {
 		WorkFlowState workFlowState = workFlow.getWorkFlowState();
-		if (workFlowState.getExecutionStatus() == WorkFlowExecutionStatus.EXECUTION_COMPLETE) {
+		switch (workFlowState.getExecutionStatus()) {
+		case EXECUTION_COMPLETE:
 			return new DataHolder(workFlow.fetchResult(), "result");
-		} else {
+		case EXECUTION_FAILURE:
+			return new DataHolder(new WorkFlowState(workFlowState), "status");
+		default:
 			return new DataHolder(workFlowState, "status");
 		}
 	}

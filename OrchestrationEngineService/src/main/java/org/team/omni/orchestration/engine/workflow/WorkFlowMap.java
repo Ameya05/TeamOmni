@@ -5,12 +5,14 @@ import static org.jooq.impl.DSL.table;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -33,7 +35,7 @@ public class WorkFlowMap {
 	private DSLContext create;
 
 	private final Field<String> userIdField = field("user_id", String.class);
-	private final Field<Integer> workFlowIdField = field("ID", Integer.class);
+	private final Field<Integer> workFlowIdField = field("id", Integer.class);
 	private final Field<WorkFlowExecutionStatus> statusField = field("status", OrchestrationEngineUtils.createWorkFlowExecutionStatusDataType());
 	private final Field<String> currentServiceField = field("current_service", String.class);
 	private final Table<Record> workflowDetailsTable = table("work_flow_details");
@@ -84,13 +86,9 @@ public class WorkFlowMap {
 		if (result == null) {
 			return null;
 		} else {
-			int id = result.getValue(workFlowIdField);
-			String userId = result.getValue(userIdField);
-			WorkFlowExecutionStatus workFlowExecutionStatus = result.get(statusField, WorkFlowExecutionStatus.class);
-			WorkFlowState workFlowState = new WorkFlowState(create, userId, id, result.getValue(currentServiceField), result.getValue(previousServiceField), result.getValue(errorMessageField), result.getValue(detailedErrorMessageField), workFlowExecutionStatus);
-			LocalDateTime inputTimeStamp = result.getValue(inputTimeStampField, LocalDateTime.class);
-			LocalDateTime executionTimeStamp = result.getValue(executionTimeStampField, LocalDateTime.class);
-			OrchestrationEngineWorkFlow<WeatherDetails> workFlow = new SimpleWorkFlow(id, ServiceFactory.getServiceFactory(), result.getValue(stationNameField), inputTimeStamp, workFlowState, create, executionTimeStamp);
+			String userId;
+			OrchestrationEngineWorkFlow<WeatherDetails> workFlow = createOrchestrationEngineWorkFlow(result);
+			userId = workFlow.getWorkFlowState().getUserId();
 			if (workFlowDetails.containsKey(userId)) {
 				List<OrchestrationEngineWorkFlow<WeatherDetails>> workFlows = workFlowDetails.get(userId);
 				if (!workFlows.isEmpty()) {
@@ -117,6 +115,17 @@ public class WorkFlowMap {
 		}
 	}
 
+	private OrchestrationEngineWorkFlow<WeatherDetails> createOrchestrationEngineWorkFlow(Record result) {
+		int id = result.getValue(workFlowIdField);
+		String userId = result.getValue(userIdField);
+		WorkFlowExecutionStatus workFlowExecutionStatus = result.get(statusField, WorkFlowExecutionStatus.class);
+		WorkFlowState workFlowState = new WorkFlowState(create, userId, id, result.getValue(currentServiceField), result.getValue(previousServiceField), result.getValue(errorMessageField), result.getValue(detailedErrorMessageField), workFlowExecutionStatus);
+		LocalDateTime inputTimeStamp = result.getValue(inputTimeStampField, LocalDateTime.class);
+		LocalDateTime executionTimeStamp = result.getValue(executionTimeStampField, LocalDateTime.class);
+		OrchestrationEngineWorkFlow<WeatherDetails> workFlow = new SimpleWorkFlow(id, ServiceFactory.getServiceFactory(), result.getValue(stationNameField), inputTimeStamp, workFlowState, create, executionTimeStamp);
+		return workFlow;
+	}
+
 	public OrchestrationEngineWorkFlow<WeatherDetails> fetchWorkFlow(String userID, Integer workFlowId) {
 		Condition condition = userIdField.equal(userID);
 		if (workFlowId != null) {
@@ -141,6 +150,11 @@ public class WorkFlowMap {
 
 	public List<Integer> fetchWorkFlowIds(String userID) {
 		return create.select(field("ID", Integer.class)).from(workflowDetailsTable).where(userIdField.equal(userID)).orderBy(field("ID").desc()).fetch().getValues(field("ID", Integer.class));
+	}
+
+	public List<OrchestrationEngineWorkFlow<WeatherDetails>> fetchWorkFlows(String userID) {
+		Record[] records = create.select().from(workflowDetailsTable).where(userIdField.equal(userID)).orderBy(field("ID").desc()).fetchArray();
+		return Arrays.stream(records).map((Record record) -> createAndAddWorkFlow(record)).collect(Collectors.toList());
 	}
 
 	public void removeWorkFlows(String userId) {

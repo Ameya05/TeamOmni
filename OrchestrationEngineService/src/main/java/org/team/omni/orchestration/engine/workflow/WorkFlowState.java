@@ -41,6 +41,15 @@ public class WorkFlowState {
 		setWorkFlowId(workFlowId);
 	}
 
+	public WorkFlowState(WorkFlowState workFlowState) {
+		this.create = workFlowState.getCreate();
+		this.workFlowId = workFlowState.getWorkFlowId();
+		this.executionStatus = workFlowState.getExecutionStatus();
+		this.errorMessage = workFlowState.getErrorMessage();
+		this.previousService = workFlowState.getPreviousService();
+		this.currentService = workFlowState.getCurrentService();
+	}
+
 	public WorkFlowState(DSLContext create, String userId, int workFlowId, String currentService, String previousService, String errorMessage, String detailedErrorMessage, WorkFlowExecutionStatus workFlowExecutionStatus) {
 		this(create, userId, workFlowId);
 		this.setCurrentService(currentService);
@@ -53,7 +62,7 @@ public class WorkFlowState {
 	public synchronized void processCurrentService(String service) {
 		this.setPreviousService(getCurrentService());
 		this.setCurrentService(service);
-		int updateCount = create.update(workflowDetailsTable).set(currentServiceField, getCurrentService()).set(previousServiceField, getPreviousService()).where(field("ID").equal(getWorkFlowId())).execute();
+		int updateCount = getCreate().update(workflowDetailsTable).set(currentServiceField, getCurrentService()).set(previousServiceField, getPreviousService()).where(field("ID").equal(getWorkFlowId())).execute();
 		if (updateCount == 0) {
 			throw new OrchestrationEngineException("Current Service Updation of Work_Flow_Details table failed");
 		}
@@ -71,7 +80,7 @@ public class WorkFlowState {
 	@JsonIgnore
 	public synchronized void setExecutionStatus(WorkFlowExecutionStatus executionStatus, String errorMessage, String detailedErrorMessage) {
 		this.executionStatus = executionStatus;
-		UpdateSetMoreStep<Record> updateStep = create.update(workflowDetailsTable).set(statusField, executionStatus);
+		UpdateSetMoreStep<Record> updateStep = getCreate().update(workflowDetailsTable).set(statusField, executionStatus);
 		if (errorMessage != null) {
 			updateStep = updateStep.set(errorMessageField, errorMessage);
 		}
@@ -92,7 +101,7 @@ public class WorkFlowState {
 
 	public synchronized void log(String log) {
 		if (log != null) {
-			int updateCount = create.insertInto(table("work_flow_history"), field("execution_id"), field("history"), field("time_stamp", SQLDataType.LOCALDATETIME)).values(getWorkFlowId(), log, LocalDateTime.now()).execute();
+			int updateCount = getCreate().insertInto(table("work_flow_history"), field("execution_id"), field("history"), field("time_stamp", SQLDataType.LOCALDATETIME)).values(getWorkFlowId(), log, LocalDateTime.now()).execute();
 			if (updateCount == 0) {
 				throw new OrchestrationEngineException("Work Flow loging failed");
 			}
@@ -100,7 +109,7 @@ public class WorkFlowState {
 	}
 
 	public synchronized List<String> fetchCompleteHistory() {
-		return create.select(field("history")).from(table("work_flow_history")).where(field("execution_id").equal(getWorkFlowId())).fetch(field("history", String.class));
+		return getCreate().select(field("history")).from(table("work_flow_history")).where(field("execution_id").equal(getWorkFlowId())).fetch(field("history", String.class));
 	}
 
 	@JsonIgnore
@@ -108,7 +117,6 @@ public class WorkFlowState {
 		this.create = create;
 	}
 
-	@JsonIgnore
 	public synchronized DSLContext getCreate() {
 		return create;
 	}
@@ -127,7 +135,7 @@ public class WorkFlowState {
 		this.workFlowId = workFlowId;
 	}
 
-	public synchronized long getWorkFlowId() {
+	public synchronized int getWorkFlowId() {
 		return workFlowId;
 	}
 
@@ -140,7 +148,7 @@ public class WorkFlowState {
 		return this.errorMessage;
 	}
 
-	@JsonProperty
+	@JsonIgnore
 	public synchronized void setDetailedErrorMessage(String detailedErrorMessage) {
 		this.detailedErrorMessage = detailedErrorMessage;
 	}
