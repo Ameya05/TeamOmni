@@ -18,15 +18,24 @@
 		  background-color: #ffffff;
 		}
 	</style>
-	<div id="container" height="100%" width="100%" ng-controller="jobHistory">
+	<div id="container" style="padding-left: 1%; padding-right: 1%;padding-bottom: 0%; padding-top: 0%; height: 100%; width: 100%" ng-controller="jobHistory">
 		<h2> Job details </h2>
 		<table>
+			<thead>
+				<th>ID</th>
+				<th>Station</th>
+				<th>Created</th>
+				<th>Executed</th>
+				<th>Result</th>
+				<th>Current State</th>
+				<th>Status</th>
+			</thead>
 		  <tr ng-repeat="w in workflows">
 		  	<td>{{ w.id }}</td>
 		    <td>{{ w.stationName }}</td>
-		    <td>{{ w.inputTimeStamp }}</td>
-		    <td>{{ w.executionTimeStamp }}</td>
-		    <td>{{ w.weatherDetails }}</td>
+		    <td>{{ w.inputTimeStamp.monthValue +"/" + w.inputTimeStamp.dayOfMonth +"/"+ w.inputTimeStamp.year +" "+ w.inputTimeStamp.hour +":"+ w.inputTimeStamp.hour +":"+ w.inputTimeStamp.hour  }}</td>
+		    <td>{{ w.executionTimeStamp.monthValue +"/" + w.executionTimeStamp.dayOfMonth +"/"+ w.executionTimeStamp.year +" "+ w.executionTimeStamp.hour +":"+ w.executionTimeStamp.hour +":"+ w.executionTimeStamp.hour  }}</td>
+		    <td>{{ w.weatherDetails.imageURL }}</td>
 		    <td>{{ w.workFlowState.currentService }}</td>
 		    <td>{{ w.workFlowState.executionStatus }}</td>
 		  </tr>
