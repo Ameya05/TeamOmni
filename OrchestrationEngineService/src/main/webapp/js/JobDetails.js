@@ -26,10 +26,9 @@ angular
 				})
 				.success(
 					function(response) {
-						alert(response);
 						$scope.workflows = response.data;
 				})
 				.error(function(response) {
-					alert(response);
+					alert("Failed to fetch job history");
 				})
 			} ]);
