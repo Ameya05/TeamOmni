@@ -35,7 +35,7 @@
 		    <td>{{ w.stationName }}</td>
 		    <td>{{ w.inputTimeStamp.monthValue +"/" + w.inputTimeStamp.dayOfMonth +"/"+ w.inputTimeStamp.year +" "+ w.inputTimeStamp.hour +":"+ w.inputTimeStamp.minute +":"+ w.inputTimeStamp.second  }}</td>
 		    <td>{{ w.executionTimeStamp.monthValue +"/" + w.executionTimeStamp.dayOfMonth +"/"+ w.executionTimeStamp.year +" "+ w.executionTimeStamp.hour +":"+ w.executionTimeStamp.minute +":"+ w.executionTimeStamp.second  }}</td>
-		    <td>{{ w.weatherDetails.imageURL }}</td>
+		    <td><a href={{w.weatherDetails.imageURL}} target="_blank" ng-hide="w.weatherDetails.imageURL"></a></td>
 		    <td>{{ w.workFlowState.currentService }}</td>
 		    <td>{{ w.workFlowState.executionStatus }}</td>
 		  </tr>
