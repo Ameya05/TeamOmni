@@ -49,7 +49,7 @@ public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetail
 	private Thread workFlowExecutionThread = null;
 	private DSLContext create;
 
-	public SimpleWorkFlow(int id, ServiceFactory serviceFactory, String stationName, LocalDateTime inputTimeStamp, WorkFlowState workFlowState, DSLContext create, LocalDateTime executionTimeStamp) {
+	public SimpleWorkFlow(int id, ServiceFactory serviceFactory, String stationName, LocalDateTime inputTimeStamp, WorkFlowState workFlowState, DSLContext create, LocalDateTime executionTimeStamp, WeatherDetails weatherDetails) {
 		this.serviceFactory = serviceFactory;
 		this.setStationName(stationName);
 		this.setInputTimeStamp(inputTimeStamp);
@@ -57,6 +57,7 @@ public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetail
 		this.setId(id);
 		this.create = create;
 		this.setExecutionTimeStamp(executionTimeStamp);
+		this.setWeatherDetails(weatherDetails);
 	}
 
 	public <T, U extends Service> T executeService(ServiceExecution<T, U> serviceExecution, Class<U> serviceClass) {
@@ -127,7 +128,7 @@ public class SimpleWorkFlow implements OrchestrationEngineWorkFlow<WeatherDetail
 			return getWeatherDetails();
 		} else {
 			Record1<WeatherDetails> res = create.select(resultField).from(table("work_flow_details")).where(field("id").equal(getId())).fetchOne();
-			this.processWeatherDetails(res.value1());
+			this.setWeatherDetails(res.value1());
 			return getWeatherDetails();
 		}
 	}

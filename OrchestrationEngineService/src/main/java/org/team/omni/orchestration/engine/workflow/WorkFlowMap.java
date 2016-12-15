@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.jooq.Condition;
+import org.jooq.Converter;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
@@ -63,7 +64,7 @@ public class WorkFlowMap {
 		}
 		LocalDateTime executionTimeStamp = LocalDateTime.now();
 		int id = createId(userId, stationName, timeStamp, WorkFlowExecutionStatus.EXECUTION_STARTED, executionTimeStamp);
-		OrchestrationEngineWorkFlow<WeatherDetails> workFlow = new SimpleWorkFlow(id, ServiceFactory.getServiceFactory(), stationName, timeStamp, new WorkFlowState(create, userId, id), create, executionTimeStamp);
+		OrchestrationEngineWorkFlow<WeatherDetails> workFlow = new SimpleWorkFlow(id, ServiceFactory.getServiceFactory(), stationName, timeStamp, new WorkFlowState(create, userId, id), create, executionTimeStamp, null);
 		workFlowQueue.add(workFlow);
 		workFlow.executeWorkFlow();
 		return workFlow.getWorkFlowState().getExecutionStatus();
@@ -122,7 +123,9 @@ public class WorkFlowMap {
 		WorkFlowState workFlowState = new WorkFlowState(create, userId, id, result.getValue(currentServiceField), result.getValue(previousServiceField), result.getValue(errorMessageField), result.getValue(detailedErrorMessageField), workFlowExecutionStatus);
 		LocalDateTime inputTimeStamp = result.getValue(inputTimeStampField, LocalDateTime.class);
 		LocalDateTime executionTimeStamp = result.getValue(executionTimeStampField, LocalDateTime.class);
-		OrchestrationEngineWorkFlow<WeatherDetails> workFlow = new SimpleWorkFlow(id, ServiceFactory.getServiceFactory(), result.getValue(stationNameField), inputTimeStamp, workFlowState, create, executionTimeStamp);
+		Converter<String, WeatherDetails> weatherDetailsConverter = new WeatherDetailsConverter(new ObjectMapper());
+		WeatherDetails weatherDetails = weatherDetailsConverter.from(result.getValue(field("result", String.class)));
+		OrchestrationEngineWorkFlow<WeatherDetails> workFlow = new SimpleWorkFlow(id, ServiceFactory.getServiceFactory(), result.getValue(stationNameField), inputTimeStamp, workFlowState, create, executionTimeStamp, weatherDetails);
 		return workFlow;
 	}
 
