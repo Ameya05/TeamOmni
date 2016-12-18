@@ -1,9 +1,6 @@
-FROM jfloff/alpine-python:latest
+FROM jetty
 ARG APP_URL
-RUN apk --update  add curl ca-certificates libxml2-dev libxslt-dev 
-RUN curl -o app.tar.gz https://s3-us-west-2.amazonaws.com/sga-team-omni/omniDataIngestor.tar.gz
+RUN curl -o app.tar.gz ${APP_URL}
 RUN tar -zxvf app.tar.gz
-EXPOSE 65000
-WORKDIR  MicroserviceB
-RUN pip install -r requirements.txt
-CMD python -m org.team.omni.data.ingestor.DataIngestorService --host 0.0.0.0 --port 65000
+RUN cp *.war /var/lib/jetty/webapps
+CMD ["java","-jar","/usr/local/jetty/start.jar"]
