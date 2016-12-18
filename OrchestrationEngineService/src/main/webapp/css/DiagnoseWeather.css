@@ -1,0 +1,27 @@
+#container {
+	border-style: outset;
+	border-width: 2px;
+	border-color: #cccccc;
+	background-color: #A9A9A9;
+	display: table;
+	padding-top: 10%;
+	padding-bottom: 10%;
+	padding-left: 40%;
+	padding-right: 40%;
+}
+
+#row {
+	display: table-row;
+}
+
+input{
+	width: 100%;
+	margin: 10px 0;
+	padding: 14px 20px;
+	box-sizing: border-box;
+}
+
+
+input:focus {
+	 border: 2px solid #666;
+}

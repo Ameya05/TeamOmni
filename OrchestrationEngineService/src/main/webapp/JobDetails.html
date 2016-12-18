@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html ng-app="omni">
+<head>
+	<title>Omni Weather Forecast</title>
+	<link rel="stylesheet" type="text/css" href="css/DiagnoseWeather.css">
+</head>
+<body>
+	<style>
+		table, th , td {
+		  border: 1px solid grey;
+		  border-collapse: collapse;
+		  padding: 5px;
+		}
+		table tr:nth-child(odd) {
+		  background-color: #f1f1f1;
+		}
+		table tr:nth-child(even) {
+		  background-color: #ffffff;
+		}
+	</style>
+	<div id="container" style="padding-left: 1%; padding-right: 1%;padding-bottom: 0%; padding-top: 0%; height: 100%; width: 100%" ng-controller="jobHistory">
+		<h2> Job details </h2>
+		<table>
+			<thead>
+				<th>ID</th>
+				<th>Station Input</th>
+				<th>DateTime Input</th>
+				<th>Job update Time</th>
+				<th>Result</th>
+				<th>Current State</th>
+				<th>Status</th>
+			</thead>
+		  <tr ng-repeat="w in workflows">
+		  	<td>{{ w.id }}</td>
+		    <td>{{ w.stationName }}</td>
+		    <td>{{ w.inputTimeStamp.monthValue +"/" + w.inputTimeStamp.dayOfMonth +"/"+ w.inputTimeStamp.year +" "+ w.inputTimeStamp.hour +":"+ w.inputTimeStamp.minute +":"+ w.inputTimeStamp.second  }}</td>
+		    <td>{{ w.executionTimeStamp.monthValue +"/" + w.executionTimeStamp.dayOfMonth +"/"+ w.executionTimeStamp.year +" "+ w.executionTimeStamp.hour +":"+ w.executionTimeStamp.minute +":"+ w.executionTimeStamp.second  }}</td>
+		    <td><a href={{w.weatherDetails.imageURL}} target="_blank" ng-show="w.weatherDetails!=null">Forecast</a></td>
+		    <td>{{ w.workFlowState.currentService }}</td>
+		    <td>{{ w.workFlowState.executionStatus }}</td>
+		  </tr>
+		</table>
+	</div>
+</body>
+</html>

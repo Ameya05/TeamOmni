@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html ng-app="omni">
+<head>
+	<title>Omni Weather Forecast</title>
+	<link rel="stylesheet" type="text/css" href="css/DiagnoseWeather.css">
+</head>
+<body>
+	<div id="container" height="80%" width="20%" ng-controller="DiagnoseWeather">
+		<h2> Please enter details </h2>
+		<form id="details">
+			<label for="fdate">Date</label>
+			<input type="date" id="fdate" name="fdate" ng-model="date" placeholder="yyyy-MM-dd"/>
+			<label for="ftime">Time</label>
+			<input type="time" id="ftime" name="ftime" ng-model="time" placeholder="HH:mm:ss"/>
+			<label for="fstation">Station Name</label><br/>
+			<select autocomplete="off" id="fstation" name="fstation" ng-model="station">
+				<option selected value="KHDX">Holloman AFB, NM</option>
+				<option value="KHGX">Houston, TX</option>
+				<option value="KHTX">Huntsville/Hytop, AL</option>
+				<option value="KIND">Indianapolis, IN</option>
+				<option value="KJKL">Jackson, KY</option>
+				<option value="KDGX">Jackson, MS</option>
+			</select>
+			<input type="button" ng-click="click()" value="Diagnose Weather Conditions"/>
+			<input type="button" onclick="redirectToDetails()" value="See Job History"/>
+		</form>
+		
+	</div>
+</body>
+</html>
