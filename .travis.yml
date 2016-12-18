@@ -5,21 +5,22 @@ jdk:
 sudo: false
 branches:
   only:
-    - feature-microservice-D
-install: true
-
+    - milestone4-microservice-F
+    
 before_script:
   - wget -N https://s3-us-west-2.amazonaws.com/sga-team-omni/LoadBalanceAndServiceDiscovery-1.0.jar
   - mvn install:install-file -Dfile=LoadBalanceAndServiceDiscovery-1.0.jar -DgroupId=org.team.omni.weather -DartifactId=LoadBalanceAndServiceDiscovery -Dversion=1.0 -Dpackaging=jar
+    
+install: true
+script: cd MicroserviceF && mvn clean package
 
-script: cd MicroserviceD && mvn package
 
 before_deploy:
   - cd ..
-  - cp MicroserviceD/target/*.war . || true
-  - tar -cvzf omniStormClustering.tar.gz MicroserviceD scripts appspec.yml *.war Dockerfile || true
+  - cp MicroserviceF/target/*.war . || true
+  - tar -cvzf omniRunForecast.tar.gz MicroserviceF scripts appspec.yml *.war Dockerfile || true
   - mkdir -p "s3_upload_dir"
-  - mv omniStormClustering.tar.gz s3_upload_dir/omniStormClustering.tar.gz || true
+  - mv omniRunForecast.tar.gz s3_upload_dir/omniRunForecast.tar.gz || true
 
 deploy:
   - provider: s3
@@ -33,16 +34,16 @@ deploy:
     skip_cleanup: true
     on:
       repo: airavata-courses/TeamOmni
-      branch: feature-microservice-D
+      branch: milestone4-microservice-F
   - provider: codedeploy
     access_key_id: $ARTIFACTS_KEY
     secret_access_key: $ARTIFACTS_SECRET
     bucket: sga-team-omni
-    key: omniStormClustering.tar.gz
+    key: omniRunForecast.tar.gz
     bundle_type: tgz
     application: SGA-TeamOmni
-    deployment_group: SGA-TeamOmni
+    deployment_group: SGA-TeamOmniProduction
     region: us-east-1
     on:
       repo: airavata-courses/TeamOmni
-      branch: feature-microservice-D
+      branch: milestone4-microservice-F
