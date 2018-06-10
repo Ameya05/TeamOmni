@@ -37,9 +37,9 @@ def execute_flask(flask_app, default_host="0.0.0.0", default_port=65000):
                         default=default_port)
     args = parser.parse_args()
     print(args)
-    global SERVICE_REGISTRATION
-    SERVICE_REGISTRATION=register_service(args.port)
-    SERVICE_REGISTRATION.register_service()
+    #global SERVICE_REGISTRATION
+    #SERVICE_REGISTRATION=register_service(args.port)
+    #SERVICE_REGISTRATION.register_service()
     flask_app.run(host=args.host,port=args.port)
 
 
@@ -99,19 +99,19 @@ def internal_server_error(error):
     resp = make_response("Server Error", 500)
     return resp
 
-@APP.before_request
-def before_request():
-    SERVICE_REGISTRATION.update_work_load(UNIT_WORK_LOAD)
+#@APP.before_request
+#def before_request():
+#    SERVICE_REGISTRATION.update_work_load(UNIT_WORK_LOAD)
 
-@APP.after_request
-def after_request(response):
-    SERVICE_REGISTRATION.update_work_load(UNIT_WORK_LOAD_DECREASE)
-    return response
+#@APP.after_request
+#def after_request(response):
+#    SERVICE_REGISTRATION.update_work_load(UNIT_WORK_LOAD_DECREASE)
+#    return response
 
-@APP.teardown_request
-def tear_down_request(exception):
-    if exception:
-        SERVICE_REGISTRATION.update_work_load(UNIT_WORK_LOAD_DECREASE)
+#@APP.teardown_request
+#def tear_down_request(exception):
+#    if exception:
+#        #SERVICE_REGISTRATION.update_work_load(UNIT_WORK_LOAD_DECREASE)
 
 
 
