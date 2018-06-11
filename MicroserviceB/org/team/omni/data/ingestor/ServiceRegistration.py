@@ -26,9 +26,9 @@ class ServiceRegistration:
         LOGGER.info("Started Registering. ID: " + self._service_id)
         service_inst_json = json.dumps(self._service_instance)
         if not self._zk.exists(SERVICE_NODE):
-            self._zk.create(SERVICE_NODE)
+            self._zk.create(SERVICE_NODE,makepath=True)
         if not self._zk.exists(self._service_instance_node):
-            self._zk.create(self._service_instance_node, value=self.__get_service_instance_as_json_byte(), ephemeral=True)
+            self._zk.create(self._service_instance_node, value=self.__get_service_instance_as_json_byte(), ephemeral=True, makepath=True)
         LOGGER.info("Registration Complete")
 
     def __get_service_instance_as_json_byte(self):
