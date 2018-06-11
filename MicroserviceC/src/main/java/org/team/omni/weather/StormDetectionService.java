@@ -21,7 +21,7 @@ import org.apache.log4j.Logger;
 @Path("/")
 public class StormDetectionService {
 
-	final String filename = "Sample.kml";
+	final String filename = "omniStormDetection/MicroserviceC/Sample.kml";
 
 	static {
 		System.setProperty("my.log", System.getProperty("user.dir") + File.separator + "MicroClogs.log");
