@@ -16,7 +16,7 @@
   </servlet-mapping>
   <context-param>
   	<param-name>zookeeper</param-name>
-  	<param-value>localhost:2181</param-value>
+  	<param-value>ec2-18-216-35-96.us-east-2.compute.amazonaws.com:2181</param-value>
   </context-param>
   <listener>
   	<listener-class>org.team.omni.weather.CurrentApplicationContextListener</listener-class>
